@@ -98,6 +98,7 @@ $(document).on("keydown", function(e){
 		  processManualProcedures('LOAD_SCENE');
 		}
 	  processManualProcedures('READ-MATCH-AND-POPULATE');
+	  processManualProcedures('CHECK_CONNECTION');
 	}, 1000);
   </script>  
 </head>
@@ -116,6 +117,7 @@ $(document).on("keydown", function(e){
 	         </div> 
            </div>
           <div class="card-body">
+          <div id="CheckConnection_div"></div> 
           	<div id="logging_stats_div" style="display:none;">
 			</div>
 			  <div class="panel-group" id="match_configuration">
@@ -123,7 +125,6 @@ $(document).on("keydown", function(e){
 			      <div class="panel-heading">
 			        <h2 class="panel-title" style="font-size: 25px; text-shadow: 2px 5px 6px #BBA2B6">
 			          <a data-toggle="collapse" data-parent="#match_configuration" href="#load_setup_match">Configuration</a>
-			          <!-- <a data-bs-toggle="collapse" data-bs-parent="#match_configuration" href="#load_setup_match">Configuration</a> -->
 			        </h2>
 			      </div>
 			      <div id="load_setup_match" class="panel-collapse collapse">
@@ -147,16 +148,9 @@ $(document).on("keydown", function(e){
 									</c:forEach>
 						      </select>
 						 </div>
-						 
-					    <!-- <button style="background-color:#2E008B;color:#FEFEFE;" class="btn btn-sm" type="button"
-					  		name="load_scene_btn" id="load_scene_btn" onclick="processUserSelection(this)">
-					  		<i class="fas fa-film"></i> Load Scene</button> -->
 					  	  <button style="background-color:#2E008B;color:#FEFEFE; font-size: 18px; text-shadow: 2px 5px 6px #BBA2B6; align-content: right;" class="btn btn-sm" type="button"
 					  		name="get_container_btn" id="get_container_btn"   onclick="processUserSelection(this)" >
 					  		<i class="fas fa-film"></i> Get Container </button>
-					  	  <!-- <button style="background-color:#2E008B;color:#FEFEFE;" class="btn btn-sm" type="button"
-					  		name="load_previous_data_btn" id="load_previous_data_btn"   onclick="processUserSelection(this)" >
-					  		<i class="fas fa-film"></i> Load Previous XML Data </button> -->
 					  	   <button style="background-color:#2E008B;color:#FEFEFE; font-size: 18px; text-shadow: 2px 5px 6px #BBA2B6; align-content: right;" class="btn btn-sm" type="button"
 					  		name="load_container_btn" id="load_container_btn"   onclick="processUserSelection(this)" >
 					  		<i class="fas fa-film"></i> Load XML </button>
@@ -174,18 +168,13 @@ $(document).on("keydown", function(e){
 			    </div>
 			  </div> 
 		    <div class="form-group row row-bottom-margin ml-2" style="margin-bottom:5px;">
-			  	<!-- <div id="event_stats_div" style="display:none;"></div> -->
-			  	<%-- <div id="preview_div" class="form-group row mr-0" >
-				  <img id="preview_image" class="pull-right img-responsive" src="<c:url value="/resources/Images/Blank_Preview.png"/>" alt="PreviewImage" width="700" height="700">
-				  <!-- <img id="preview_image" class="pull-right img-responsive" src="file:///D:/Temp/Preview.png" alt="PreviewImage" width="300" height="300"> -->
-				</div> --%>
            </div>
           </div>
          </div>
        </div>
     </div>
  </div>
-<div id="previews" style="display: flex; align-items: flex-start; margin-right: 20px; margin-left: 100px; ">
+ <div id="previews" style="display: flex; align-items: flex-start; margin-right: 20px; margin-left: 100px; ">
     <div id="event_stats_div" style="display:none; background-color: white; border-radius: 2px;box-shadow: 10px 5px 50px #9AA2A2;
     	 padding-top: 28px; padding-left: 8px; padding-right: 8px; width: auto; margin-right: 20px;">
     </div>

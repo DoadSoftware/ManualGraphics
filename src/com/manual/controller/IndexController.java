@@ -419,7 +419,7 @@ public class IndexController
 	{	
 		switch (whatToProcess.toUpperCase()) {
 		
-		case "LOAD_SCENE": case "LOAD_DATA": case "LOAD_PREVIOUS_SCENE": case "ANIMATE-OUT": case "ANIMATE-IN": case "CLEAR-ALL": case "BADMINTON-OPTIONS": 
+		case "LOAD_SCENE": case "LOAD_DATA": case "CHECK_CONNECTION":case "LOAD_PREVIOUS_SCENE": case "ANIMATE-OUT": case "ANIMATE-IN": case "CLEAR-ALL": case "BADMINTON-OPTIONS": 
 		case "READ-DATA-AND-PREVIEW": case "LOAD_CONTAINER": case "PREVIEW":case "MATCH_PREVIEW":case"PREVIEW_IMAGE_DATA":
 			switch (session_selected_sports) {
 			
@@ -620,6 +620,9 @@ public class IndexController
 					
 					break;
 				}
+				
+				File file = new File(ManualUtil.MANUAL_DIRECTORY + ManualUtil.CONTAINER_FILE);
+				
 				switch (whatToProcess.toUpperCase()) {
 				case "LOAD_PREVIOUS_SCENE":
 					
@@ -643,13 +646,25 @@ public class IndexController
 					
 				case "LOAD_DATA":
 					imgdata.clear();
+			        // Check if the file exists
+			        if (file.exists()) {
+			            // Try to delete the file
+			            if (file.delete()) {
+			                System.out.println("File deleted successfully.");
+			            } else {
+			                System.out.println("Failed to delete the file.");
+			            }
+			        }
+			        
 					if(session_Configurations.getIpAddressScenes().equalsIgnoreCase("localhost") || session_Configurations.getIpAddressScenes().equalsIgnoreCase("")) {
 					//Rows and columns with unwanted tags removed
 						if(valueToProcess.contains(",")) {
-							print_writer.println("LAYER1*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET vRows " +valueToProcess.split(",")[1]+ ";");
-							print_writer.println("LAYER1*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET vCoumms " +valueToProcess.split(",")[2]+ ";");
+							print_writer.println("LAYER1*EVEREST*STAGE*DIRECTOR*In SHOW 138.0;");
+							print_writer.println("LAYER1*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET vRows " +valueToProcess.split(",")[2]+ ";");
+							print_writer.println("LAYER1*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET vCoumms " +valueToProcess.split(",")[1]+ ";");
 							print_writer.println("LAYER1*EVEREST*GLOBAL TEMPLATE_SAVE_ACTIVE_ONLY " +
 									ManualUtil.MANUAL_DIRECTORY + ManualUtil.CONTAINER_FILE + ";");
+							print_writer.println("LAYER1*EVEREST*STAGE*DIRECTOR*In SHOW 0.0;");
 						}else {
 							print_writer.println("LAYER1*EVEREST*GLOBAL TEMPLATE_SAVE " +
 									ManualUtil.MANUAL_DIRECTORY + ManualUtil.CONTAINER_FILE + ";");
@@ -678,11 +693,22 @@ public class IndexController
 						return JSONArray.fromObject(allLines).toString();
 					}else {
 						//Rows and columns with unwanted tags removed
+				        // Check if the file exists
+				        if (file.exists()) {
+				            // Try to delete the file
+				            if (file.delete()) {
+				                System.out.println("File deleted successfully.");
+				            } else {
+				                System.out.println("Failed to delete the file.");
+				            }
+				        }
 						if(valueToProcess.contains(",")) {
-							print_writer.println("LAYER1*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET vRows " +valueToProcess.split(",")[1]+ ";");
-							print_writer.println("LAYER1*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET vCoumms " +valueToProcess.split(",")[2]+ ";");
+							print_writer.println("LAYER1*EVEREST*STAGE*DIRECTOR*In SHOW 138.0;");
+							print_writer.println("LAYER1*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET vRows " +valueToProcess.split(",")[2]+ ";");
+							print_writer.println("LAYER1*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET vCoumms " +valueToProcess.split(",")[1]+ ";");
 							print_writer.println("LAYER1*EVEREST*GLOBAL TEMPLATE_SAVE_ACTIVE_ONLY " + "//" + session_Configurations.getIpAddressScenes() + "//" + 
 									ManualUtil.MANUAL_DIRECTORY.replace("C:", "c") + ManualUtil.CONTAINER_FILE + ";");
+							print_writer.println("LAYER1*EVEREST*STAGE*DIRECTOR*In SHOW 0.0;");
 						}else {
 							print_writer.println("LAYER1*EVEREST*GLOBAL TEMPLATE_SAVE " + "//" + session_Configurations.getIpAddressScenes() + "//" + 
 									ManualUtil.MANUAL_DIRECTORY.replace("C:", "c") + ManualUtil.CONTAINER_FILE + ";");
@@ -726,6 +752,7 @@ public class IndexController
 				}
 				break;
 			}
+			
 			switch (whatToProcess.toUpperCase()) {
 			
 			case "ANIMATE-OUT":
@@ -739,6 +766,13 @@ public class IndexController
 			case "CLEAR-ALL":
 				print_writer.println("LAYER1*EVEREST*SINGLE_SCENE CLEAR;");
 				return JSONObject.fromObject(null).toString();
+			
+			case "CHECK_CONNECTION":
+				JSONObject json = new JSONObject();
+				String connection = session_Configurations.getIpAddressEverest().equalsIgnoreCase("LOCALHOST")? 
+						ManualFunctions.checkConnection("127.0.0.1", session_Configurations.getPortNumber(), 1000): ManualFunctions.checkConnection(session_Configurations.getIpAddressEverest(), session_Configurations.getPortNumber(), 1000);
+				 json.put("connection_type", connection);
+			    return json.toString();
 			}
 		
 		default:

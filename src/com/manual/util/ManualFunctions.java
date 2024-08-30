@@ -1,6 +1,10 @@
 package com.manual.util;
 
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.util.concurrent.TimeUnit;
 
 public class ManualFunctions 
@@ -36,4 +40,22 @@ public class ManualFunctions
 		
         return "";
     }
+	public static String checkConnection(String ip, int port, int timeout) {
+        Socket socket = new Socket();
+        try {
+            socket.connect(new InetSocketAddress(ip, port), timeout);
+            return "Connected";
+        } catch (SocketTimeoutException e) {
+            return "Disconnected";
+        } catch (IOException e) {
+            return "Disconnected";
+        } finally {
+            try {
+                socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+	
 }

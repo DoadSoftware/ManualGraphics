@@ -227,7 +227,7 @@ function processManualProcedures(whatToProcess)
 	
 	switch(whatToProcess) {
 	case 'LOAD_SCENE': case 'LOAD_PREVIOUS_SCENE': case 'LOAD_DATA': case 'BADMINTON-OPTIONS': case 'CRICKET-OPTIONS': case 'FOOTBALL-OPTIONS':
-	case 'READ-DATA-AND-PREVIEW': case 'ANIMATE-IN': case 'LOAD_CONTAINER': case 'READ-MATCH-AND-POPULATE': case 'PREVIEW':case'PREVIEW_IMAGE_DATA':
+	case 'READ-DATA-AND-PREVIEW': case 'ANIMATE-IN': case"CHECK_CONNECTION":case 'LOAD_CONTAINER': case 'READ-MATCH-AND-POPULATE': case 'PREVIEW':case'PREVIEW_IMAGE_DATA':
     	switch(whatToProcess) {
 		case 'LOAD_SCENE':
 			valueToProcess = $('#selectedScene option:selected').val();
@@ -239,7 +239,7 @@ function processManualProcedures(whatToProcess)
 			if($('#selectedScene option:selected').val().includes('_Rows_')){
 				valueToProcess = $('#selectedScene option:selected').val()+","+$('#rows').val()+","+$('#column').val();
 				 $('#RowCol_stats_div').empty();
-	    		 //$('#RowCol_stats_div').style.display = '';
+	    		 $('#RowCol_stats_div').css('display', 'none');
 			}else{
 				valueToProcess = $('#selectedScene option:selected').val();
 			}
@@ -267,7 +267,7 @@ function processManualProcedures(whatToProcess)
 				previous_data = '';
 				processManualProcedures('PREVIEW');
 			}
-			break;			
+			break;		
     	}
 		break;
 	}
@@ -278,7 +278,6 @@ function processManualProcedures(whatToProcess)
         data : 'whatToProcess=' + whatToProcess + '&valueToProcess=' + valueToProcess, 
         dataType : 'json',
         success : function(data) {
-			
 			switch(whatToProcess) {
 			case 'LOAD_DATA':
 				addItemsToList('LOAD_DATA-OPTIONS',data);
@@ -291,6 +290,9 @@ function processManualProcedures(whatToProcess)
 			case'PREVIEW_IMAGE_DATA':
 				addItemsToList('PREVIEW_IMAGE_TO_DIV',data);
 			 	break;	
+			case "CHECK_CONNECTION":	
+				addItemsToList('CONNECTION_TO_DIV',data);
+			break;
 			/*case 'PREVIEW':
 				document.getElementById('preview_image').src = URL.createObjectURL(new Blob(["C://Temp//Preview.png"], {type: "image/png"}));
 				break;*/
@@ -320,7 +322,42 @@ function addItemsToList(whatToProcess, dataToProcess){
 
 	var option,i,label,select,div,col_num_per_row = 0, col_id = 0;
 	
-	switch (whatToProcess) {
+  switch (whatToProcess) {
+	
+	 case "CONNECTION_TO_DIV":
+	    $('#CheckConnection_div').empty();
+	    div = document.getElementById('CheckConnection_div');
+	    div.style.display = 'flex';
+	    div.style.alignItems = 'center'; 
+	    div.style.justifyContent = 'flex-end'; 
+	
+	    // Create the circle in div
+	    option = document.createElement('div');
+	    option.style.width = '20px';
+	    option.style.height = '20px';
+	    option.style.borderRadius = '50%';
+	    option.style.marginRight = '10px';
+	    option.style.backgroundColor = dataToProcess.connection_type.toLowerCase()=== "connected"  ? 'green' : 'red';
+	    option.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.3)'; // 3D shadow
+	    	
+	    // Create the label for circle
+	    label = document.createElement('span');
+	    label.innerHTML = dataToProcess.connection_type.toLowerCase()=== "connected" ? '<b>CONNECTED</b>' : '<b>DISCONNECTED</b>';
+	    label.style.marginLeft = '10px'; 
+	    label.style.marginRight = '10px';
+	    label.style.verticalAlign = 'middle';
+		label.style.padding = '5px 10px'; 
+	    label.style.fontSize = '15px'; 
+	    label.style.fontWeight = '1000';
+	    label.style.color = dataToProcess.connection_type.toLowerCase()=== "connected" ? 'green' : 'red'; 
+	    label.style.textShadow = '2px 2px 3px rgba(0, 0, 0, 0.5)'; // 3D text shadow
+	    label.style.textTransform = 'uppercase';
+		
+	    // Append elements to the div
+	    div.appendChild(label);
+	    div.appendChild(option);
+	break;
+	
    case "PREVIEW_IMAGE_TO_DIV":
     if (dataToProcess.file_data) {
         document.getElementById('preview_img').src = URL.createObjectURL(
