@@ -1,15 +1,10 @@
 package com.manual.controller;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
@@ -17,7 +12,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -119,6 +113,42 @@ public class IndexController
 			    }
 			}));
 			break;
+		case "BASKETBALL":
+			if(session_Configurations.getIpAddressScenes().equalsIgnoreCase("localhost") || session_Configurations.getIpAddressScenes().equalsIgnoreCase("")) {
+				model.addAttribute("session_viz_scenes", new File(ManualUtil.BASKETBALL_SCENE_DIRECTORY + ManualUtil.SCENES_DIRECTORY).listFiles(new FileFilter() {
+					@Override
+				    public boolean accept(File pathname) {
+				        String name = pathname.getName().toLowerCase();
+				        return name.endsWith(".sum") && pathname.isFile();
+				    }
+				}));
+				
+				model.addAttribute("scene_files", new File(ManualUtil.MANUAL_DIRECTORY + ManualUtil.DATA_DIRECTORY).listFiles(new FileFilter() {
+					@Override
+				    public boolean accept(File pathname) {
+				        String name = pathname.getName().toLowerCase();
+				        return name.endsWith(".xml") && pathname.isFile();
+				    }
+				}));
+			}else {
+				model.addAttribute("session_viz_scenes", new File("//" + session_Configurations.getIpAddressScenes() + "//" + ManualUtil.CRICKET_SCENE_DIRECTORY.replace("C:", "c") + ManualUtil.SCENES_DIRECTORY).listFiles(new FileFilter() {
+					@Override
+				    public boolean accept(File pathname) {
+				        String name = pathname.getName().toLowerCase();
+				        return name.endsWith(".sum") && pathname.isFile();
+				    }
+				}));
+				
+				model.addAttribute("scene_files", new File("//" + session_Configurations.getIpAddressScenes() + "//" + ManualUtil.MANUAL_DIRECTORY.replace("C:", "c") + ManualUtil.DATA_DIRECTORY).listFiles(new FileFilter() {
+					@Override
+				    public boolean accept(File pathname) {
+				        String name = pathname.getName().toLowerCase();
+				        return name.endsWith(".xml") && pathname.isFile();
+				    }
+				}));
+			}
+			
+			break;
 		case "CRICKET":
 			if(session_Configurations.getIpAddressScenes().equalsIgnoreCase("localhost") || session_Configurations.getIpAddressScenes().equalsIgnoreCase("")) {
 				model.addAttribute("session_viz_scenes", new File(ManualUtil.CRICKET_SCENE_DIRECTORY + ManualUtil.SCENES_DIRECTORY).listFiles(new FileFilter() {
@@ -200,6 +230,42 @@ public class IndexController
 			        return name.endsWith(".xml") && pathname.isFile();
 			    }
 			}));
+			break;
+		case "BASKETBALL":
+			if(session_Configurations.getIpAddressScenes().equalsIgnoreCase("localhost") || session_Configurations.getIpAddressScenes().equalsIgnoreCase("")) {
+				model.addAttribute("session_viz_scenes", new File(ManualUtil.BASKETBALL_SCENE_DIRECTORY + ManualUtil.SCENES_DIRECTORY).listFiles(new FileFilter() {
+					@Override
+				    public boolean accept(File pathname) {
+				        String name = pathname.getName().toLowerCase();
+				        return name.endsWith(".sum") && pathname.isFile();
+				    }
+				}));
+				
+				model.addAttribute("scene_files", new File(ManualUtil.MANUAL_DIRECTORY + ManualUtil.DATA_DIRECTORY).listFiles(new FileFilter() {
+					@Override
+				    public boolean accept(File pathname) {
+				        String name = pathname.getName().toLowerCase();
+				        return name.endsWith(".xml") && pathname.isFile();
+				    }
+				}));
+			}else {
+				model.addAttribute("session_viz_scenes", new File("//" + session_Configurations.getIpAddressScenes() + "//" + ManualUtil.CRICKET_SCENE_DIRECTORY.replace("C:", "c") + ManualUtil.SCENES_DIRECTORY).listFiles(new FileFilter() {
+					@Override
+				    public boolean accept(File pathname) {
+				        String name = pathname.getName().toLowerCase();
+				        return name.endsWith(".sum") && pathname.isFile();
+				    }
+				}));
+				
+				model.addAttribute("scene_files", new File("//" + session_Configurations.getIpAddressScenes() + "//" + ManualUtil.MANUAL_DIRECTORY.replace("C:", "c") + ManualUtil.DATA_DIRECTORY).listFiles(new FileFilter() {
+					@Override
+				    public boolean accept(File pathname) {
+				        String name = pathname.getName().toLowerCase();
+				        return name.endsWith(".xml") && pathname.isFile();
+				    }
+				}));
+			}
+			
 			break;
 		case "CRICKET":
 			if(session_Configurations.getIpAddressScenes().equalsIgnoreCase("localhost") || session_Configurations.getIpAddressScenes().equalsIgnoreCase("")) {
@@ -329,7 +395,7 @@ public class IndexController
 								new File(ManualUtil.MANUAL_DIRECTORY + 
 										ManualUtil.DATA_DIRECTORY + file_name + ManualUtil.XML));
 						break;
-					case "CRICKET":
+					case "CRICKET":case "BASKETBALL":
 //						if(session_Configurations.getIpAddressScenes().equalsIgnoreCase("localhost") || session_Configurations.getIpAddressScenes().equalsIgnoreCase("")) {
 //							JAXBContext.newInstance(ContainerData.class).createMarshaller().marshal(new ContainerData(containers), 
 //									new File(ManualUtil.MANUAL_DIRECTORY + 
@@ -525,7 +591,7 @@ public class IndexController
 				}
 				break;
 				
-			case "CRICKET":
+			case "CRICKET":case "BASKETBALL":
 				switch(whatToProcess.toUpperCase()) {
 				case "LOAD_CONTAINER":
 					imgdata.clear();
@@ -609,15 +675,25 @@ public class IndexController
 				case "LOAD_SCENE":
 					is_previous_data = false;
 					Scene = valueToProcess;
-					if(session_Configurations.getIpAddressEverest().equalsIgnoreCase("localhost") || session_Configurations.getIpAddressScenes().equalsIgnoreCase("")) {
-						new Scene(ManualUtil.CRICKET_SCENE_DIRECTORY + ManualUtil.SCENES_DIRECTORY + valueToProcess).
-						scene_load(print_writer,ManualUtil.CRICKET_SCENE_DIRECTORY + ManualUtil.SCENES_DIRECTORY + valueToProcess);
+					if(session_selected_sports.equalsIgnoreCase("BASKETBALL")) {
+						if(session_Configurations.getIpAddressEverest().equalsIgnoreCase("localhost") || session_Configurations.getIpAddressScenes().equalsIgnoreCase("")) {
+							new Scene(ManualUtil.BASKETBALL_SCENE_DIRECTORY + ManualUtil.SCENES_DIRECTORY + valueToProcess).
+							scene_load(print_writer,ManualUtil.BASKETBALL_SCENE_DIRECTORY + ManualUtil.SCENES_DIRECTORY + valueToProcess);
+						}else {
+							new Scene("//" + session_Configurations.getIpAddressScenes() + "//" + ManualUtil.BASKETBALL_SCENE_DIRECTORY.replace("C:", "c") + 
+									ManualUtil.SCENES_DIRECTORY + valueToProcess).scene_load(print_writer,"//" + session_Configurations.getIpAddressScenes() +
+											"//" + ManualUtil.BASKETBALL_SCENE_DIRECTORY.replace("C:", "c") + ManualUtil.SCENES_DIRECTORY + valueToProcess);
+						}
 					}else {
-						new Scene("//" + session_Configurations.getIpAddressScenes() + "//" + ManualUtil.CRICKET_SCENE_DIRECTORY.replace("C:", "c") + 
-								ManualUtil.SCENES_DIRECTORY + valueToProcess).scene_load(print_writer,"//" + session_Configurations.getIpAddressScenes() +
-										"//" + ManualUtil.CRICKET_SCENE_DIRECTORY.replace("C:", "c") + ManualUtil.SCENES_DIRECTORY + valueToProcess);
+						if(session_Configurations.getIpAddressEverest().equalsIgnoreCase("localhost") || session_Configurations.getIpAddressScenes().equalsIgnoreCase("")) {
+							new Scene(ManualUtil.CRICKET_SCENE_DIRECTORY + ManualUtil.SCENES_DIRECTORY + valueToProcess).
+							scene_load(print_writer,ManualUtil.CRICKET_SCENE_DIRECTORY + ManualUtil.SCENES_DIRECTORY + valueToProcess);
+						}else {
+							new Scene("//" + session_Configurations.getIpAddressScenes() + "//" + ManualUtil.CRICKET_SCENE_DIRECTORY.replace("C:", "c") + 
+									ManualUtil.SCENES_DIRECTORY + valueToProcess).scene_load(print_writer,"//" + session_Configurations.getIpAddressScenes() +
+											"//" + ManualUtil.CRICKET_SCENE_DIRECTORY.replace("C:", "c") + ManualUtil.SCENES_DIRECTORY + valueToProcess);
+						}
 					}
-					
 					break;
 				}
 				
@@ -939,7 +1015,7 @@ public class IndexController
 					}else {
 						containers.add(new Container(Integer.valueOf(Key.split("_")[0]), Key, Value));
 					}
-					//break;
+					//break;	
 				}
 			}
 		

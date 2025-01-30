@@ -109,7 +109,7 @@ function processUserSelection(whichInput)
 			document.getElementById('previews').style.display = 'none';
 			break;
 		case 'select_sports':
-		ipAddress = $('#vizIPAddressEverest').val();
+			ipAddress = $('#vizIPAddressEverest').val();
 			switch ($('#select_sports :selected').val()) {
 				
 				

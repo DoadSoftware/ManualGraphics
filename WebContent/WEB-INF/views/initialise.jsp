@@ -73,6 +73,7 @@
 			      		<option value="CRICKET">CRICKET</option>
 			      		<option value="FOOTBALL">FOOTBALL</option>
 			          	<option value="BADMINTON">BADMINTON</option>
+			          	<option value="BASKETBALL">BASKETBALL</option>
 			      </select>
 			    </div>
 			  </div>
