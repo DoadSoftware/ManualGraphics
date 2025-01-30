@@ -131,7 +131,7 @@ public class IndexController
 				    }
 				}));
 			}else {
-				model.addAttribute("session_viz_scenes", new File("//" + session_Configurations.getIpAddressScenes() + "//" + ManualUtil.CRICKET_SCENE_DIRECTORY.replace("C:", "c") + ManualUtil.SCENES_DIRECTORY).listFiles(new FileFilter() {
+				model.addAttribute("session_viz_scenes", new File("//" + session_Configurations.getIpAddressScenes() + "//" + ManualUtil.BASKETBALL_SCENE_DIRECTORY.replace("C:", "c") + ManualUtil.SCENES_DIRECTORY).listFiles(new FileFilter() {
 					@Override
 				    public boolean accept(File pathname) {
 				        String name = pathname.getName().toLowerCase();
@@ -249,7 +249,7 @@ public class IndexController
 				    }
 				}));
 			}else {
-				model.addAttribute("session_viz_scenes", new File("//" + session_Configurations.getIpAddressScenes() + "//" + ManualUtil.CRICKET_SCENE_DIRECTORY.replace("C:", "c") + ManualUtil.SCENES_DIRECTORY).listFiles(new FileFilter() {
+				model.addAttribute("session_viz_scenes", new File("//" + session_Configurations.getIpAddressScenes() + "//" + ManualUtil.BASKETBALL_SCENE_DIRECTORY.replace("C:", "c") + ManualUtil.SCENES_DIRECTORY).listFiles(new FileFilter() {
 					@Override
 				    public boolean accept(File pathname) {
 				        String name = pathname.getName().toLowerCase();
