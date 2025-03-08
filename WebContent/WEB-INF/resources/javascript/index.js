@@ -447,7 +447,8 @@ function addItemsToList(whatToProcess, dataToProcess){
 						select.id = (i - 1) + '_' + dataToProcess[i].split(':')[0];
 						
 						select.setAttribute('onchange','processUserSelection(this);');
-						select.setAttribute('onchange','processPreviewSelection(this);');
+						//select.setAttribute('onchange','processPreviewSelection(this);');
+						select.setAttribute('onblur', 'processPreviewSelection(this);');
 						label = document.createElement('label');
 						label.type = 'label';
 						label.style = 'display:block';
@@ -466,7 +467,9 @@ function addItemsToList(whatToProcess, dataToProcess){
 						label.innerHTML = (i - 1) + '_' +  dataToProcess[i].split(':')[0] + '<br>';
 						label.for = select.id;
 						div.appendChild(label).appendChild(select);
-						select.setAttribute('oninput','processPreviewSelection(this);');
+						//select.setAttribute('oninput','processPreviewSelection(this);');
+						select.setAttribute('onblur', 'processPreviewSelection(this);');
+
 					}
 					row.insertCell(col_id).appendChild(label).appendChild(select);
 				}
