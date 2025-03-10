@@ -360,13 +360,15 @@ function addItemsToList(whatToProcess, dataToProcess){
 	
    case "PREVIEW_IMAGE_TO_DIV":
     if (dataToProcess.file_data) {
-        document.getElementById('preview_img').src = URL.createObjectURL(
-            new Blob([new Uint8Array(dataToProcess.file_data)], { type: dataToProcess.content_type })
-        );
-        document.getElementById('preview_image_div').style.display = 'block';
-    } else {
-        console.error("Error: File does not exist.");
-    }
+    // Convert Base64 to Data URL and set it as the image source
+	    document.getElementById('preview_img').src =
+	        "data:" + dataToProcess.content_type + ";base64," + dataToProcess.file_data;
+	
+	    document.getElementById('preview_image_div').style.display = 'block';
+	} else {
+	    console.error("Error: File does not exist.");
+	}
+
     break;
 	case 'ROWS_COLUMN-OPTIONS':
 		$('#RowCol_stats_div').empty();

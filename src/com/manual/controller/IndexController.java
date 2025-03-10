@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -819,7 +820,7 @@ public class IndexController
 				        : Paths.get("\\\\" + session_Configurations.getIpAddressEverest() + "\\c\\Temp\\Preview.png");
 
 				    if (Files.exists(filePath)) {
-				        json.put("file_data", Files.readAllBytes(filePath));
+				        json.put("file_data", Base64.getEncoder().encodeToString(Files.readAllBytes(filePath)));
 				        json.put("content_type", "image/PNG");
 				        return json.toString();
 				    }
