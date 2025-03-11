@@ -94,26 +94,20 @@
       processManualProcedures('CHECK_CONNECTION');
     }, 1000);
   </script>
-
-  <!-- Existing Base CSS -->
-  <style type="text/css">
-  body {
-    font-size: 1.95rem; /* 22px converted to rem (assuming 16px base) */
-  }
-  h1, h2, h3, h4, h5, h6,a {
-    font-size: larger; /* This remains relative to the base font-size */
-  }
-  button, input, select, textarea {
-    font-size: 1.7rem; /* 18px converted to rem */
-  }
-  .card-title, .panel-title, .form-group label {
-    font-size: 1.8rem; /* 20px converted to rem */
-  }
-</style>
-
-
   <!-- Additional Responsive & Modern CSS -->
   <style type="text/css">
+   body {
+    font-size: 1.95rem; /* 22px converted to rem (assuming 16px base) */
+   }
+   h1, h2, h3, h4, h5, h6,a {
+    font-size: larger; /* This remains relative to the base font-size */
+   }
+   button, input, select, textarea {
+    font-size: 1.7rem; /* 18px converted to rem */
+   }
+   .card-title, .panel-title, .form-group label {
+     font-size: 1.8rem; /* 20px converted to rem */
+   }
     /* Subtle gradient background for entire page */
     body {
     margin: 0;
@@ -204,6 +198,12 @@
       padding: 28px 8px;
       margin-right: 20px;
     }
+    #event_stats_div {
+	    display: block; /* Ensure it's visible */
+	    overflow-y: auto; /* Enable vertical scrolling */
+	    max-height: 65vh; /* Set a maximum height for scrolling */
+	}
+    
     /* Media query for smaller screens */
     @media (max-width: 768px) {
       /* Stack the Scenes/XML and Buttons vertically */
@@ -259,7 +259,12 @@
 	  word-wrap: break-word;
 	  overflow-wrap: break-word;
 	}
-
+	html, body {
+	    overflow-x: hidden; /* Prevent horizontal scrolling */
+	    overflow-y: hidden; /* Prevent vertical scrolling on larger screens */
+	    margin: 0;
+	    padding: 0;
+	}
     /* Responsive table container */
 	.table-responsive {
 	  width: 100%;
@@ -370,6 +375,11 @@
 	.red-btn:hover {
 	  color: #fff; 
 	  box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.15);
+	}
+	@media screen and (max-width: 768px) { 
+	    body {
+	        overflow-y: auto;
+	    }
 	}	
   </style>
 </head>
@@ -458,10 +468,10 @@
  </div>
  <div id="previews" style="display: flex; align-items: flex-start; justify-content: space-between; margin-left: 5%; width: 90%;">
     <div id="event_stats_div" style="display:none; background-color: white; border-radius: 2px; box-shadow: 10px 5px 50px #9AA2A2;
-         padding: 28px 8px; width: 50%; height: auto; margin-right: 20px;">
+         padding: 28px 8px; width: 50%; height: 50%; margin-right: 20px;">
     </div>
     <div id="preview_image_div" style="display:none; background-color: white; border-radius: 2px; box-shadow: 10px 5px 50px #9AA2A2; 
-        padding: 8px; width: 50%; height: 40%;">
+        padding: 8px; width: 50%; height: 65vh;">
         <img id="preview_img" style="width: 100%; height: 100%;" alt="Preview Image">
     </div>
 </div>

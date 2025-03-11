@@ -495,7 +495,7 @@ function addItemsToList(whatToProcess, dataToProcess){
 			select.id = 'save_button';
 			select.className = 'btn btn-success position-absolute top-0 start-50 translate-middle-x shadow-lg';
 	        select.style.padding = '4px 8px'; // Adjust padding
-	        select.style.fontSize = '16px'; // Font size
+	        select.style.fontSize = '1.9rem'; // Font size
 	        select.style.borderRadius = '8px'; // Rounded corners
 	        select.style.transition = 'all 0.3s ease'; // Smooth transition
 	
@@ -523,7 +523,7 @@ function addItemsToList(whatToProcess, dataToProcess){
 			cancelButton.id = 'cancel_graphics_btn';
 		 	cancelButton.className = 'btn btn-danger position-absolute top-0 start-50 translate-middle-x shadow-lg';
 	        cancelButton.style.padding = '4px 8px'; // Adjust padding
-	        cancelButton.style.fontSize = '16px'; // Font size
+	        cancelButton.style.fontSize = '1.9rem'; // Font size
 	        cancelButton.style.borderRadius = '8px'; // Rounded corners
 	        cancelButton.style.transition = 'all 0.3s ease'; // Smooth transition
 	
