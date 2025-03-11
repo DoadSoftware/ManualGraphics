@@ -556,7 +556,7 @@ function addItemsToList(whatToProcess, dataToProcess){
 			div = document.createElement('div');
 			
 			table = document.createElement('table');
-			table.setAttribute('class', 'table table-bordered');
+			table.setAttribute('class', 'table table-responsive');
 			
 			tbody = document.createElement('tbody');
 			
