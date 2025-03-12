@@ -58,6 +58,10 @@ public class IndexController
 	String Scene;
 	boolean is_previous_data = false;
 	List<ImageData> imgdata = new ArrayList<ImageData>();
+	@RequestMapping(value = "/contact", method = RequestMethod.GET)
+	public String showContactPage() {
+	    return "contact"; // Loads contact.jsp
+	}
 	@RequestMapping(value = {"/","/initialise"}, method={RequestMethod.GET,RequestMethod.POST}) 
 	public String initialisePage(ModelMap model) throws JAXBException  
 	{
