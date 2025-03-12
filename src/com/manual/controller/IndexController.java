@@ -489,7 +489,10 @@ public class IndexController
 					throws IOException, IllegalAccessException, InvocationTargetException, JAXBException, InterruptedException
 	{	
 		switch (whatToProcess.toUpperCase()) {
-		
+		case "BUILD_CONNECTION":
+			print_writer = new PrintWriter(new Socket(session_Configurations.getIpAddressEverest(), 
+					session_Configurations.getPortNumber()).getOutputStream(), true);
+			return null;
 		case "LOAD_SCENE": case "LOAD_DATA": case "CHECK_CONNECTION":case "LOAD_PREVIOUS_SCENE": case "ANIMATE-OUT": case "ANIMATE-IN": case "CLEAR-ALL": case "BADMINTON-OPTIONS": 
 		case "READ-DATA-AND-PREVIEW": case "LOAD_CONTAINER": case "PREVIEW":case "MATCH_PREVIEW":case"PREVIEW_IMAGE_DATA":
 			switch (session_selected_sports) {

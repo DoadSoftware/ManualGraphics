@@ -450,6 +450,9 @@
 							    <button class="btn btn-sm red-btn" type="button" name="clear_all_btn" id="clear_all_btn" onclick="processUserSelection(this)">
 							      Clear All
 							    </button>
+							    <button class="btn btn-sm red-btn" type="button" name="connection_btn" id="connection_btn" onclick="processUserSelection(this)">
+							     RE CONNECT
+							    </button>
 							  </div>
 							</div>
 						 <div class="form-group row row-bottom-margin ml-2">

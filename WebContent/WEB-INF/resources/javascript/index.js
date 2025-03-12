@@ -93,6 +93,9 @@ function processUserSelection(whichInput)
 				processManualProcedures('CLEAR-ALL');	
 			}
 			break;
+		case 'connection_btn':
+			processManualProcedures('BUILD_CONNECTION');
+		break;
 		case 'cancel_graphics_btn':
 			$('#event_stats_div').empty();
 			document.getElementById('event_stats_div').style.display = 'none';
