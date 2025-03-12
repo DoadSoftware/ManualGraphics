@@ -261,7 +261,7 @@
 	}
 	html, body {
 	    overflow-x: hidden; /* Prevent horizontal scrolling */
-	    overflow-y: hidden; /* Prevent vertical scrolling on larger screens */
+	    overflow-y: auto; /* vertical scrolling on larger screens */
 	    margin: 0;
 	    padding: 0;
 	}

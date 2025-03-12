@@ -37,14 +37,6 @@ function initialisePage(whichPage)
 	
 	}
 }
-function initialiseForm(whatToProcess, dataToProcess)
-{
-	/*switch (whatToProcess){
-	case '':
-
-		break;
-	}*/
-}
 function processPreviewSelection(whichInput)
 {
 	if($(whichInput).attr('id').includes('Logo') || $(whichInput).attr('id').includes('Image')){
@@ -449,7 +441,6 @@ function addItemsToList(whatToProcess, dataToProcess){
 						select.id = (i - 1) + '_' + dataToProcess[i].split(':')[0];
 						
 						select.setAttribute('onchange','processUserSelection(this);');
-						//select.setAttribute('onchange','processPreviewSelection(this);');
 						select.setAttribute('onblur', 'processPreviewSelection(this);');
 						label = document.createElement('label');
 						label.type = 'label';
@@ -457,7 +448,7 @@ function addItemsToList(whatToProcess, dataToProcess){
 						label.innerHTML =(i - 1) + '_' + dataToProcess[i].split(':')[0];
 						label.for = select.id;
 						div.appendChild(label).appendChild(select);
-						select.setAttribute('onchange','processPreviewSelection(this);');
+						select.setAttribute('onblur', 'processPreviewSelection(this);');
 					}else{
 						select = document.createElement('input')
 						select.type = 'text';
@@ -469,7 +460,7 @@ function addItemsToList(whatToProcess, dataToProcess){
 						label.innerHTML = (i - 1) + '_' +  dataToProcess[i].split(':')[0] + '<br>';
 						label.for = select.id;
 						div.appendChild(label).appendChild(select);
-						//select.setAttribute('oninput','processPreviewSelection(this);');
+						select.setAttribute('onchange','processUserSelection(this);');
 						select.setAttribute('onblur', 'processPreviewSelection(this);');
 
 					}
@@ -560,7 +551,7 @@ function addItemsToList(whatToProcess, dataToProcess){
 			
 			tbody = document.createElement('tbody');
 			
-			dataToProcess.containers.forEach(function(cont,index,array){
+			dataToProcess.containers.forEach(function(cont){
 				if(cont.container_key == 'scenePath'){
 				}else{
 					if(col_num_per_row % 4 == 0) {
@@ -576,9 +567,6 @@ function addItemsToList(whatToProcess, dataToProcess){
 						select.type = 'file';
 						select.accept = 'image/*';
 						select.id = cont.container_key;
-						//select.src = cont.container_value.split("Media/")[1];
-						//document.getElementById(cont.container_key).setAttribute("src");
-						//select.setAttribute('onchange','processUserSelection(this);');
 						
 						label = document.createElement('label');
 						label.type = 'label';
@@ -587,15 +575,11 @@ function addItemsToList(whatToProcess, dataToProcess){
 							label.innerHTML = cont.container_key;
 						}else{
 							label.innerHTML = cont.container_key + " (" + cont.container_value.split("Media/")[1].replace("DOAD_","") + ")";
-							//$('#' + cont.container_key).val(cont.container_value.split("Media/")[1]);
-							//previous_data = cont.container_value.split("Media/")[1].replace("DOAD_","");
 						}
 						label.for = select.id;
-						//select.setAttribute('onchange','userSelection(this);');
-						select.setAttribute('onchange','processUserSelection(this);');
-						select.setAttribute('onchange','processPreviewSelection(this);');
 						row.insertCell(col_id).appendChild(label).appendChild(select);
-						select.setAttribute('onchange','processPreviewSelection(this);');
+						select.setAttribute('onchange','processUserSelection(this);');
+						select.setAttribute('onblur','processPreviewSelection(this);');
 					}else{
 						select = document.createElement('input');
 						select.type = 'text';
@@ -607,9 +591,9 @@ function addItemsToList(whatToProcess, dataToProcess){
 						label.style = 'display:block';
 						label.innerHTML = cont.container_key + '<br>';
 						label.for = select.id;
-						select.setAttribute('oninput','processPreviewSelection(this);');
 						row.insertCell(col_id).appendChild(label).appendChild(select);
-						select.setAttribute('oninput','processPreviewSelection(this);');
+						select.setAttribute('onchange','processUserSelection(this);');
+						select.setAttribute('onblur','processPreviewSelection(this);');
 
 					}
 				}
