@@ -339,7 +339,6 @@ public class IndexController
 		File file;
 		MultipartFile mpf;
 		String whichFile = "",file_name = "";
-		
 			if (request.getRequestURI().contains("save_data")||request.getRequestURI().contains("preview")) {
 				
 				List<Container> containers = new ArrayList<Container>();
@@ -647,16 +646,16 @@ public class IndexController
 						Collections.sort(session_Data.getContainers());
 						
 						if(whatToProcess.toUpperCase().equalsIgnoreCase("READ-DATA-AND-PREVIEW")) {
-							if(session_Configurations.getIpAddressEverest().equalsIgnoreCase("localhost") || session_Configurations.getIpAddressScenes().equalsIgnoreCase("")) {
-								if(!session_Configurations.getIpAddressEverest().trim().isEmpty() && session_Configurations.getPortNumber() != 0) {
-									new Scene(session_Data.getContainers().get(0).getContainer_value()).
-									scene_load(print_writer,session_Data.getContainers().get(0).getContainer_value());
-								}
-								
-							}else {
-								new Scene(session_Data.getContainers().get(0).getContainer_value().replace("C:", "c")).
-										scene_load(print_writer,session_Data.getContainers().get(0).getContainer_value().replace("C:", "c"));
-							}
+//							if(session_Configurations.getIpAddressEverest().equalsIgnoreCase("localhost") || session_Configurations.getIpAddressScenes().equalsIgnoreCase("")) {
+//								if(!session_Configurations.getIpAddressEverest().trim().isEmpty() && session_Configurations.getPortNumber() != 0) {
+//									new Scene(session_Data.getContainers().get(0).getContainer_value()).
+//									scene_load(print_writer,session_Data.getContainers().get(0).getContainer_value());
+//								}
+//								
+//							}else {
+//								new Scene(session_Data.getContainers().get(0).getContainer_value().replace("C:", "c")).
+//										scene_load(print_writer,session_Data.getContainers().get(0).getContainer_value().replace("C:", "c"));
+//							}
 						}
 						
 						for(int i = 1; i < session_Data.getContainers().size() ; i++) {

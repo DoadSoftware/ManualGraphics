@@ -376,9 +376,54 @@
 	  color: #fff; 
 	  box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.15);
 	}
-	@media screen and (max-width: 768px) { 
+	/* For mobile devices (max-width: 768px) */
+	@media (max-width: 768px) {
 	    body {
-	        overflow-y: auto;
+	        font-size: 1.4rem; /* Adjust base font size for better readability */
+	    }
+	
+	    /* Stack .panel-body and rows vertically */
+	    .panel-body {
+	        flex-direction: column; /* Stack content vertically */
+	        gap: 1.5rem;
+	    }
+	
+	    /* Adjust table layout */
+	    .table th, .table td {
+	        font-size: 1.4rem; /* Smaller font size for mobile */
+	        padding: 12px; /* Increase padding for touch */
+	    }
+	
+	    .configuration-row .left-col,
+	    .configuration-row .right-col {
+	        min-width: 100%; /* Full width for columns on mobile */
+	        margin-bottom: 1rem;
+	    }
+	
+	    .card-body {
+	        padding: 15px; /* Reduce padding for tighter mobile layout */
+	    }
+	
+	    /* Adjust the card body padding */
+	    .card.card-outline-secondary {
+	        margin-bottom: 15px; /* Reduce card spacing for smaller screens */
+	    }
+	
+	    /* Adjust buttons */
+	    .btn-sm {
+	        font-size: 1.4rem;
+	        padding: 12px 18px;
+	    }
+	
+	    .purple-btn,
+	    .red-btn {
+	        font-size: 1.4rem; /* Smaller button size for mobile */
+	        padding: 12px 20px;
+	    }
+	
+	    /* Ensure the table is responsive */
+	    .table-responsive {
+	        overflow-x: scroll; /* Allow horizontal scrolling for tables */
 	    }
 	}	
   </style>

@@ -25,35 +25,46 @@
         }
         .container-box {
             display: flex;
-            width: 100%;
-            height: 100%;
+            width: 90%;
+            height: auto;
+            max-width: 1200px;
             background: white;
             border-radius: 8px;
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
             overflow: hidden;
+            flex-wrap: wrap;
         }
         .left-section {
-            width: 50%;
-		    display: flex;
-		    flex-direction: column; /* Stack elements vertically */
-		    justify-content: center; /* Center vertically */
-		    align-items: center; /* Center horizontally */
-		    background: linear-gradient(135deg, #2563EB, #1E40AF);
-		    color: white;
-		    text-align: center;
-		    padding: 40px;
-		    font-size: 48px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #2563EB, #1E40AF);
+            color: white;
+            text-align: center;
+            padding: 40px;
         }
         .left-section h2 {
-            font-size: 28px;
+            font-size: 5vw;
             margin-top: 20px;
         }
         .right-section {
-            width: 50%;
+            flex: 1;
             padding: 40px;
             text-align: center;
-            justify-content: center; /* Centers horizontally */
-    		display: flex;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container-box_Right {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 450px;
+            text-align: center;
         }
         .form-group {
             text-align: left;
@@ -86,117 +97,73 @@
             font-size: 14px;
             color: #555;
         }
-         /* Form Container */
-    .container-box_Right ,img{
-	    background: white;
-	    padding: 30px;
-	    border-radius: 8px;
-	    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-	    width: 450px;
-	    text-align: center;
-	}
-	.font {
-	    font-size: 5vw; /* Adjusts based on screen width */
-	    text-transform: uppercase;
-	}
-	.btn-submit {
-        width: 100%;
-        background-color: #2563EB; /* Deep Blue */
-        color: white;
-        font-size: 17px;
-        font-weight: bold;
-        padding: 12px;
-        border-radius: 6px;
-        border: none;
-        cursor: pointer;
-        transition: 0.3s;
-        margin-top: 10px;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .btn-submit:hover {
-        background: #1E40AF; /* Darker Blue */
-    }
-
-    .btn-submit::after {
-        content: '\f072'; /* FontAwesome bird icon */
-        font-family: 'Font Awesome 5 Free';
-        font-weight: 900;
-        position: absolute;
-        left: -20px;
-        top: 50%;
-        transform: translateY(-50%);
-        opacity: 0;
-        transition: left 3s ease-in-out, opacity 3s;
-    }
-
-    .btn-submit:hover::after {
-        left: calc(100% + 10px);
-        opacity: 1;
-    }
-	
+        .logo {
+            max-width: 100%;
+            height: auto;
+        }
+        @media (max-width: 768px) {
+            .container-box {
+                flex-direction: column;
+                width: 95%;
+            }
+            .left-section {
+                width: 100%;
+                padding: 20px;
+            }
+            .right-section {
+                width: 100%;
+                padding: 20px;
+            }
+            .left-section h2 {
+                font-size: 6vw;
+            }
+            .container-box_Right {
+                width: 100%;
+                padding: 20px;
+            }
+        }
     </style>
 </head>
 <body>
 <div class="container-box">
-    <!-- Left Section -->
     <div class="left-section">
         <p class="font">Welcome Back</p>
         <p>Nice to see you again!</p>
     </div>
-
-    <!-- Right Section - Initialise Settings -->
     <div class="right-section">
-    <div class ="container-box_Right">
- <!-- Logo -->
-    <img src="<c:url value='/resources/Images/Idents.jpg'/>" alt="DOAD Logo" class="logo">
-
-    <!-- Page Title -->
-    <h2>Initialise Settings</h2>
-
-    <!-- Form -->
-    <form:form name="initialise_form" autocomplete="off" action="manual" method="POST" enctype="multipart/form-data">
-
-        <div class="form-group">
-            <label for="vizIPAddressEverest">IP Address Everest</label>
-            <input type="text" id="vizIPAddressEverest" name="vizIPAddressEverest" class="form-control"
-                value="${session_Configurations.ipAddressEverest}" required placeholder="Enter Everest IP">
+        <div class="container-box_Right">
+            <img src="<c:url value='/resources/Images/Idents.jpg'/>" alt="DOAD Logo" class="logo">
+            <h2>Initialise Settings</h2>
+            <form:form name="initialise_form" autocomplete="off" action="manual" method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="vizIPAddressEverest">IP Address Everest</label>
+                    <input type="text" id="vizIPAddressEverest" name="vizIPAddressEverest" class="form-control" value="${session_Configurations.ipAddressEverest}" required placeholder="Enter Everest IP">
+                </div>
+                <div class="form-group">
+                    <label for="vizIPAddressScenes">IP Address Scenes</label>
+                    <input type="text" id="vizIPAddressScenes" name="vizIPAddressScenes" class="form-control" value="${session_Configurations.ipAddressScenes}" required placeholder="Enter Scenes IP">
+                </div>
+                <div class="form-group">
+                    <label for="vizPortNumber">Port Number</label>
+                    <input type="number" id="vizPortNumber" name="vizPortNumber" class="form-control" value="1980" required>
+                </div>
+                <div class="form-group">
+                    <label for="select_sports">Select Sport</label>
+                    <select id="select_sports" name="select_sports" class="form-control">
+                        <option value="CRICKET">CRICKET</option>
+                        <option value="FOOTBALL">FOOTBALL</option>
+                        <option value="BADMINTON">BADMINTON</option>
+                        <option value="BASKETBALL">BASKETBALL</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-submit">
+                    <i class="fas fa-check"></i> SUBMIT
+                </button>
+            </form:form>
+            <div class="footer">
+                <p>Need help? <a href="<c:url value='/contact' />" style="color: #2563EB; text-decoration: underline; font-size: 16px;">Contact Support</a></p>
+            </div>
         </div>
-
-        <div class="form-group">
-            <label for="vizIPAddressScenes">IP Address Scenes</label>
-            <input type="text" id="vizIPAddressScenes" name="vizIPAddressScenes" class="form-control"
-                value="${session_Configurations.ipAddressScenes}" required placeholder="Enter Scenes IP">
-        </div>
-
-        <div class="form-group">
-            <label for="vizPortNumber">Port Number</label>
-            <input type="number" id="vizPortNumber" name="vizPortNumber" class="form-control" value="1980" required>
-        </div>
-
-        <div class="form-group">
-            <label for="select_sports">Select Sport</label>
-            <select id="select_sports" name="select_sports" class="form-control">
-                <option value="CRICKET">CRICKET</option>
-                <option value="FOOTBALL">FOOTBALL</option>
-                <option value="BADMINTON">BADMINTON</option>
-                <option value="BASKETBALL">BASKETBALL</option>
-            </select>
-        </div>
-
-        <!-- Submit Button -->
-        <button type="submit" class="btn-submit">
-            <i class="fas fa-check"></i> SUBMIT
-        </button>
-
-    </form:form>
-
-    <!-- Footer -->
-    <div class="footer">
-        <p>Need help? <a href="<c:url value='/contact' />" style="color: #2563EB; text-decoration: underline; font-size: 16px;">Contact Support</a></p>
-    </div>
-</div>
     </div>
 </div>
 </body>
