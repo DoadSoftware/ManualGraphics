@@ -56,6 +56,7 @@ public class IndexController
 	String session_selected_sports,session_selected_PreviewIp;
 	String Data;
 	String Scene;
+	public static boolean IsGraphicOnScreen = false;
 	boolean is_previous_data = false;
 	List<ImageData> imgdata = new ArrayList<ImageData>();
 	@RequestMapping(value = "/contact", method = RequestMethod.GET)
@@ -437,7 +438,7 @@ public class IndexController
 					}
 					TimeUnit.SECONDS.sleep(1);
 					Scene = containers.get(0).getContainer_value().split("/")[ containers.get(0).getContainer_value().split("/").length-1].replace(".sum", "");
-					ManualFunctions.Preview(session_selected_sports,Scene, print_writer);
+					ManualFunctions.Preview(session_selected_sports,Scene, print_writer ,IsGraphicOnScreen);
 				}
 				
 			}else if (request.getRequestURI().contains("uploadFileToManual")) {
@@ -499,11 +500,13 @@ public class IndexController
 			case "BADMINTON":
 				switch(whatToProcess.toUpperCase()) {
 				case "LOAD_PREVIOUS_SCENE":
+					IsGraphicOnScreen = false;
 					new Scene(ManualUtil.BADMINTON_SCENE_DIRECTORY + ManualUtil.SCENES_DIRECTORY + Scene).
 						scene_load(print_writer,ManualUtil.BADMINTON_SCENE_DIRECTORY + ManualUtil.SCENES_DIRECTORY + Scene);
 					break;
 				case "LOAD_SCENE":
 					Scene = valueToProcess;
+					IsGraphicOnScreen = false;
 					new Scene(ManualUtil.BADMINTON_SCENE_DIRECTORY + ManualUtil.SCENES_DIRECTORY + valueToProcess).
 						scene_load(print_writer,ManualUtil.BADMINTON_SCENE_DIRECTORY + ManualUtil.SCENES_DIRECTORY + valueToProcess);
 					break;
@@ -520,7 +523,7 @@ public class IndexController
 								+"_", "") + " " + session_Data.getContainers().get(i).getContainer_value() + ";");
 						
 					}
-					ManualFunctions.Preview(session_selected_sports,Scene, print_writer);
+					ManualFunctions.Preview(session_selected_sports,Scene, print_writer, IsGraphicOnScreen);
 					return JSONObject.fromObject(session_Data).toString();
 					
 				case "LOAD_DATA":
@@ -550,10 +553,12 @@ public class IndexController
 			case "FOOTBALL":
 				switch(whatToProcess.toUpperCase()) {
 				case "LOAD_PREVIOUS_SCENE":
+					IsGraphicOnScreen = false;
 					new Scene(ManualUtil.FOOTBALL_SCENE_DIRECTORY + ManualUtil.SCENES_DIRECTORY + Scene).
 						scene_load(print_writer,ManualUtil.FOOTBALL_SCENE_DIRECTORY + ManualUtil.SCENES_DIRECTORY + Scene);
 					break;
 				case "LOAD_SCENE":
+					IsGraphicOnScreen = false;
 					Scene = valueToProcess;
 					new Scene(ManualUtil.FOOTBALL_SCENE_DIRECTORY + ManualUtil.SCENES_DIRECTORY + valueToProcess).
 						scene_load(print_writer,ManualUtil.FOOTBALL_SCENE_DIRECTORY + ManualUtil.SCENES_DIRECTORY + valueToProcess);
@@ -561,6 +566,7 @@ public class IndexController
 				}
 				switch (whatToProcess.toUpperCase()) {
 				case "LOAD_PREVIOUS_SCENE":
+					IsGraphicOnScreen = false;
 					print_writer.println("LAYER1*EVEREST*STAGE*DIRECTOR*Out SHOW 0.0;");
 					print_writer.println("LAYER1*EVEREST*STAGE*DIRECTOR*In SHOW 0.0;");
 					session_Data = (ContainerData)JAXBContext.newInstance(ContainerData.class).createUnmarshaller().unmarshal(
@@ -572,7 +578,7 @@ public class IndexController
 								+"_", "") + " " + session_Data.getContainers().get(i).getContainer_value() + ";");
 					}
 					//Scene = session_Data.getContainers().get(0).getContainer_value().split("Scenes/")[1];
-					ManualFunctions.Preview(session_selected_sports,Scene, print_writer);
+					ManualFunctions.Preview(session_selected_sports,Scene, print_writer,IsGraphicOnScreen);
 					return JSONObject.fromObject(session_Data).toString();
 					
 				case "LOAD_DATA":
@@ -616,7 +622,18 @@ public class IndexController
 					
 					TimeUnit.SECONDS.sleep(2);
 					Scene = session_Data.getContainers().get(0).getContainer_value().split("Scenes/")[1];
+					if(session_Configurations.getIpAddressEverest().equalsIgnoreCase("localhost") || session_Configurations.getIpAddressScenes().equalsIgnoreCase("")) {
+						if(!session_Configurations.getIpAddressEverest().trim().isEmpty() && session_Configurations.getPortNumber() != 0) {
+							new Scene(session_Data.getContainers().get(0).getContainer_value()).
+							scene_load(print_writer,session_Data.getContainers().get(0).getContainer_value());
+						}
+						
+					}else {
+						new Scene(session_Data.getContainers().get(0).getContainer_value().replace("C:", "c")).
+								scene_load(print_writer,session_Data.getContainers().get(0).getContainer_value().replace("C:", "c"));
+					}
 					//ManualFunctions.Preview(Scene, print_writer);
+					ManualFunctions.Preview(session_selected_sports,Scene, print_writer ,IsGraphicOnScreen);
 					
 					return JSONObject.fromObject(session_Data).toString();
 			
@@ -674,7 +691,7 @@ public class IndexController
 							Scene = valueToProcess.replace(".xml", ".sum");
 						}
 						
-						ManualFunctions.Preview(session_selected_sports,Scene, print_writer);
+						ManualFunctions.Preview(session_selected_sports,Scene, print_writer ,IsGraphicOnScreen);
 						
 						return JSONObject.fromObject(session_Data).toString();
 					}
@@ -724,7 +741,7 @@ public class IndexController
 						print_writer.println("LAYER1*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET " + session_Data.getContainers().get(i).getContainer_key().replaceFirst((i)+"_", "") + " " + 
 												session_Data.getContainers().get(i).getContainer_value() + ";");
 					}
-					ManualFunctions.Preview(session_selected_sports,Scene, print_writer);
+					ManualFunctions.Preview(session_selected_sports,Scene, print_writer,IsGraphicOnScreen);
 					return JSONObject.fromObject(session_Data).toString();
 					
 				case "LOAD_DATA":
@@ -842,12 +859,15 @@ public class IndexController
 				//print_writer.println("LAYER1*EVEREST*STAGE*DIRECTOR*In CONTINUE_REVERSE;");
 				print_writer.println("LAYER1*EVEREST*STAGE*DIRECTOR*Out START;");
 				print_writer.println("LAYER1*EVEREST*STAGE*DIRECTOR*In CONTINUE;");
+				IsGraphicOnScreen = false;
 				return JSONObject.fromObject(null).toString();
 			case "ANIMATE-IN":
 				print_writer.println("LAYER1*EVEREST*STAGE*DIRECTOR*In START;");
+				IsGraphicOnScreen = true;
 				return JSONObject.fromObject(session_Data).toString();
 			case "CLEAR-ALL":
 				print_writer.println("LAYER1*EVEREST*SINGLE_SCENE CLEAR;");
+				IsGraphicOnScreen = false;
 				return JSONObject.fromObject(null).toString();
 			
 			case "CHECK_CONNECTION":

@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 public class ManualFunctions 
 {
-	public static String Preview(String selected_sports,String scene, PrintWriter print_writer) throws InterruptedException
+	public static String Preview(String selected_sports,String scene, PrintWriter print_writer, boolean isGraphicOnScreen) throws InterruptedException
     {
 		scene = scene.replace(".sum", "");
 		switch(selected_sports.toUpperCase()) {
@@ -35,7 +35,9 @@ public class ManualFunctions
 		print_writer.println("LAYER1*EVEREST*GLOBAL SNAPSHOT 1920 1080;");
 		TimeUnit.SECONDS.sleep(1);
 		print_writer.println("LAYER1*EVEREST*STAGE*DIRECTOR*Out SHOW 0.0;");
-		print_writer.println("LAYER1*EVEREST*STAGE*DIRECTOR*In SHOW 0.0;");
+		if(!isGraphicOnScreen) {
+			print_writer.println("LAYER1*EVEREST*STAGE*DIRECTOR*In SHOW 0.0;");	
+		}
 		print_writer.println("LAYER1*EVEREST*GLOBAL PREVIEW OFF;");	
 		
         return "";

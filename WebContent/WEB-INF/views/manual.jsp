@@ -376,56 +376,175 @@
 	  color: #fff; 
 	  box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.15);
 	}
-	/* For mobile devices (max-width: 768px) */
-	@media (max-width: 768px) {
+	/* For screens with width <= 769px (Mobile and Small Tablet) */
+	@media (max-width: 769px) {
+	
+	    /* Ensure proper body font size for readability on mobile */
 	    body {
-	        font-size: 1.4rem; /* Adjust base font size for better readability */
+	        font-size: 1.4rem; /* Adjust base font size */
 	    }
 	
-	    /* Stack .panel-body and rows vertically */
-	    .panel-body {
-	        flex-direction: column; /* Stack content vertically */
-	        gap: 1.5rem;
+	    /* .configuration-row adjustments */
+	    .configuration-row {
+	        display: flex;
+	        flex-direction: column; /* Stack items vertically */
+	        gap: 1rem; /* Space between items */
 	    }
 	
-	    /* Adjust table layout */
-	    .table th, .table td {
-	        font-size: 1.4rem; /* Smaller font size for mobile */
-	        padding: 12px; /* Increase padding for touch */
+	    /* Left and right columns in configuration-row */
+	    .left-col, .right-col {
+	        width: 100%; /* Ensure full width */
+	        min-width: 100%; /* Prevent shrinking */
+	        margin-bottom: 1rem; /* Add space between the columns */
+	        padding: 0; /* Remove unnecessary padding */
 	    }
 	
-	    .configuration-row .left-col,
-	    .configuration-row .right-col {
-	        min-width: 100%; /* Full width for columns on mobile */
-	        margin-bottom: 1rem;
+	    /* Stack .row-item elements inside .left-col and .right-col */
+	    .row-item {
+	        display: flex;
+	        flex-direction: column; /* Stack label and select vertically */
+	        gap: 0.5rem; /* Adjust gap */
+	        align-items: flex-start; /* Align items to the start */
+	    }
+	
+	    /* For the select elements, ensure they take full width */
+	    .configuration-row select {
+	        width: 100% !important; /* Ensure selects take up full width */
+	        padding: 0.8rem; /* Add some padding for better readability */
+	        font-size: 1.4rem; /* Adjust font size for mobile */
+	    }
+	
+	    /* Ensure labels inside .configuration-row also fit */
+	    .configuration-row label {
+	        font-size: 1.4rem; /* Adjust label font size for mobile */
+	        width: 100%; /* Ensure labels take full width */
+	        margin-bottom: 0.5rem; /* Add spacing between label and select */
+	    }
+	
+	    /* Adjust buttons inside .right-col */
+	    .right-col {
+	        display: flex;
+	        flex-wrap: wrap; /* Allow buttons to wrap */
+	        gap: 0.75rem; /* Adjust gap between buttons */
+	        justify-content: flex-start; /* Align buttons to the left */
+	    }
+	
+	    /* .btn-sm adjustments */
+	    .btn-sm {
+	        font-size: 1rem; /* Adjust font size for buttons */
+	        padding: 10px 18px; /* Increase padding for better touch targets */
+	    }
+	
+	    /* Adjust .purple-btn and .red-btn for better visibility and touch interaction */
+	    .purple-btn, .red-btn {
+	        font-size: 1rem; /* Adjust font size */
+	        padding: 8px 12px; /* Increase button padding */
+	    }
+		h1, h2, h3, h4, h5, h6,a {
+	    font-size: medium; /* This remains relative to the base font-size */
+	   }
+	    /* Adjust card layout for mobile */
+	    .col-md-13.offset-md-0 {
+	        width: 100%;
+	        margin: 0 auto;
+	        padding: 0 10px; /* Add padding for better spacing */
+	        border-radius: 12px;
+	    }
+	
+	    /* Previews section should stack vertically on mobile */
+	    #previews {
+	        flex-direction: column; /* Stack previews vertically */
+	        width: 100%;
+	        gap: 1rem; /* Add gap between preview items */
+	    }
+	
+	    /* Event stats and preview section visibility adjustments */
+	    #event_stats_div, #preview_image_div {
+	        width: 100%; /* Ensure these sections take up full width */
+	        margin-bottom: 1rem; /* Add spacing at the bottom */
+	        padding: 1rem;
+	    }
+	
+	    /* Adjust the card header and body padding */
+	    .card-header {
+	        padding: 12px; /* Adjust padding for better mobile fit */
 	    }
 	
 	    .card-body {
-	        padding: 15px; /* Reduce padding for tighter mobile layout */
+	        padding: 15px; /* Reduce padding for better fit on mobile */
 	    }
 	
-	    /* Adjust the card body padding */
-	    .card.card-outline-secondary {
-	        margin-bottom: 15px; /* Reduce card spacing for smaller screens */
-	    }
-	
-	    /* Adjust buttons */
-	    .btn-sm {
-	        font-size: 1.4rem;
-	        padding: 12px 18px;
-	    }
-	
-	    .purple-btn,
-	    .red-btn {
-	        font-size: 1.4rem; /* Smaller button size for mobile */
-	        padding: 12px 20px;
-	    }
-	
-	    /* Ensure the table is responsive */
+	    /* Ensure tables adjust properly on mobile */
 	    .table-responsive {
-	        overflow-x: scroll; /* Allow horizontal scrolling for tables */
+	        width: 100%;
+	        overflow-x: auto; /* Enable horizontal scrolling if needed */
 	    }
-	}	
+	
+	    /* Table cell adjustments */
+	    .table th, .table td {
+	        font-size: 1.4rem; /* Adjust font size for readability */
+	        padding: 12px; /* Add more padding for touch devices */
+	    }
+	
+	    /* Make sure all input fields are fully visible */
+	    .table td input[type="text"],
+	    .table td input[type="file"],
+	    .table td select {
+	        width: 100%; /* Full width for input fields */
+	        padding: 0.8rem; /* Add padding for touch interaction */
+	        font-size: 1.4rem; /* Adjust font size */
+	    }
+	
+	    /* Ensure select dropdowns are fully visible */
+	    .table td select {
+	        font-size: 1.4rem; /* Adjust select dropdown font size */
+	    }
+	
+	    /* Adjust the visibility of elements in the configuration row */
+	    .configuration-row select {
+	        display: block; /* Ensure select is displayed */
+	    }
+	
+	    /* Ensure scene and file select dropdowns are visible */
+	    .configuration-row .row-item select {
+	        display: block; /* Make sure select elements are shown */
+	        margin-top: 0.5rem; /* Adjust spacing */
+	    }
+	
+	    /* Ensure panel title is visible and properly sized */
+	    .panel-title {
+	        font-size: 2rem; /* Adjust font size for readability */
+	        text-shadow: none; /* Remove text-shadow */
+	    }
+	
+	    /* Adjust event stats section for visibility */
+	    #event_stats_div {
+	        display: block;
+	        overflow-y: auto; /* Enable vertical scrolling */
+	        max-height: 60vh; /* Limit height */
+	        height: auto;
+	        margin-bottom: 1rem; /* Add space between sections */
+	    }
+	}
+	table td button {
+        font-size: 1rem; 
+        border-radius: 5px; 
+        cursor: pointer; 
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;  /* Smooth transition effect */
+    }
+
+    /* On hover, change button background color and add shadow */
+    table td button:hover {
+        background-color: #1D0066; 
+        color:white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15); 
+    }
+
+    table td button:focus {
+        outline: none; 
+        box-shadow: 0 0 0 2px rgba(46, 0, 139, 0.5); 
+    }
+
   </style>
 </head>
 <body onload="reloadPage('MANUAL');">

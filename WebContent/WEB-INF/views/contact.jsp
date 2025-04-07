@@ -1,12 +1,13 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1">
     <title>Contact Support</title>
-    
-    <link rel="stylesheet" href="<c:url value='/webjars/bootstrap/5.1.3/css/bootstrap.min.css'/>"/>
     <style>
+        /* General Styles */
         body {
             font-family: 'Poppins', sans-serif;
             background: #F3F4F6;
@@ -16,52 +17,130 @@
             height: 100vh;
             margin: 0;
             color: #333;
+            background: url('<c:url value="/resources/Images/img_Contect.jpg"/>') no-repeat center fixed;
+            background-size: cover;
+        }
+    
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.33);
+            z-index: -1;
         }
 
         .container-box {
             background: white;
-            padding: 25px;
+            padding: 30px;
             border-radius: 8px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-            width: 400px;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+            width: auto;
             text-align: center;
+            opacity: 0; /* Initially hidden */
+            transform: scale(0.8); /* Initial scale */
+            animation: fadeIn 1s forwards; /* Animation on load */
         }
 
         h2 {
-            font-size: 22px;
+            font-size: 34px;
             margin-bottom: 15px;
             color: #2563EB;
+            font-weight: 600;
+        }
+
+        h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #333;
         }
 
         p {
-            font-size: 14px;
+            font-size: 16px;
             line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        li {
+            text-align: left;
+            font-size: 24px;
+            line-height: 1.5;
+            margin-left: 20px;
+            margin-bottom: 10px;
         }
 
         .btn-back {
-            margin-top: 15px;
+            margin-top: 20px;
             display: inline-block;
-            padding: 10px 15px;
+            padding: 12px 20px;
             background: #2563EB;
             color: white;
             text-decoration: none;
             border-radius: 6px;
-            font-size: 14px;
+            font-size: 20px;
+            transition: 0.3s;
         }
 
         .btn-back:hover {
             background: #1E40AF;
+            transform: translateX(-5px); /* Smooth animation on hover */
+        }
+
+        /* Animation for container-box */
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .container-box {
+                padding: 20px;
+                max-width: 100%;
+            }
+
+            h2 {
+                font-size: 24px;
+            }
+
+            h3 {
+                font-size: 18px;
+            }
+
+            p {
+                font-size: 14px;
+            }
+
+            li {
+                font-size: 16px;
+            }
+
+            .btn-back {
+                font-size: 14px;
+                padding: 10px 15px;
+            }
         }
     </style>
 </head>
 <body>
 
 <div class="container-box">
-    <h2>Contact Support</h2>
-    <p>If you need assistance, please contact our support team:</p>
-    <p><strong>Email:</strong> support@example.com</p>
-    <p><strong>Phone:</strong> +1 (800) 123-4567</p>
-    <p><strong>Working Hours:</strong> Monday - Friday, 9 AM - 6 PM</p>
+    <h2>MANUAL PATHS</h2>
+    <ul>
+        <li><b>MANUAL FOLDER:</b> C:\Sports\Manual</li>
+        <li><b>MANUAL SCENE PATH CRICKET:</b> C:/DOAD_In_House_Everest/Everest_Cricket/ACC/Scenes/</li>
+        <li><b>MANUAL SCENE PATH FOOTBALL:</b> C:/DOAD_In_House_Everest/Everest_Sports/Everest_I-League_2022/Scenes/</li>
+        <li><b>MANUAL SCENE PATH BASKETBALL:</b> C:/DOAD_In_House_Everest/Everest_Sports/BASKETBALL/Scenes/</li>
+        <li><b>MANUAL SCENE PATH BADMINTON:</b> C:/DOAD_In_House_Everest/Everest_Sports/Everest_GBPL/Scenes/</li>
+    </ul>
 
     <a href="initialise" class="btn-back">Back to Initialise</a>
 </div>

@@ -489,7 +489,7 @@ function addItemsToList(whatToProcess, dataToProcess){
 			select.id = 'save_button';
 			select.className = 'btn btn-success position-absolute top-0 start-50 translate-middle-x shadow-lg';
 	        select.style.padding = '4px 8px'; // Adjust padding
-	        select.style.fontSize = '1.9rem'; // Font size
+	        select.style.fontSize = window.innerWidth <= 480 ? '1.2rem' : window.innerWidth <= 768 ? '1.2rem' : '1.9rem';
 	        select.style.borderRadius = '8px'; // Rounded corners
 	        select.style.transition = 'all 0.3s ease'; // Smooth transition
 	
@@ -517,7 +517,7 @@ function addItemsToList(whatToProcess, dataToProcess){
 			cancelButton.id = 'cancel_graphics_btn';
 		 	cancelButton.className = 'btn btn-danger position-absolute top-0 start-50 translate-middle-x shadow-lg';
 	        cancelButton.style.padding = '4px 8px'; // Adjust padding
-	        cancelButton.style.fontSize = '1.9rem'; // Font size
+	        cancelButton.style.fontSize =  window.innerWidth <= 480 ? '1.2rem' : window.innerWidth <= 768 ? '1.2rem' : '1.9rem';
 	        cancelButton.style.borderRadius = '8px'; // Rounded corners
 	        cancelButton.style.transition = 'all 0.3s ease'; // Smooth transition
 	
@@ -544,133 +544,133 @@ function addItemsToList(whatToProcess, dataToProcess){
 		
 		case 'LOAD_PREVIOUS_SCENE-OPTIONS':
 		
-			if(dataToProcess) {
-			$('#event_stats_div').empty();
-
-			div = document.createElement('div');
-			
-			table = document.createElement('table');
-			table.setAttribute('class', 'table table-responsive');
-			
-			tbody = document.createElement('tbody');
-			
-			dataToProcess.containers.forEach(function(cont){
-				if(cont.container_key == 'scenePath'){
-				}else{
-					if(col_num_per_row % 4 == 0) {
-						row = tbody.insertRow(tbody.rows.length);
-						col_num_per_row = col_num_per_row + 1; // 7
-						col_id = 0; 
-					} else {
-						col_id = col_id + 1; // 2
-						col_num_per_row = col_num_per_row + 1; // 6
-					}
-					if(cont.container_key.includes('Logo') || cont.container_key.includes('Image')){
-						select = document.createElement('input')
-						select.type = 'file';
-						select.accept = 'image/*';
-						select.id = cont.container_key;
-						
-						label = document.createElement('label');
-						label.type = 'label';
-						label.style = 'display:block';
-						if(cont.container_value == ''){
-							label.innerHTML = cont.container_key;
-						}else{
-							label.innerHTML = cont.container_key + " (" + cont.container_value.split("Media/")[1].replace("DOAD_","") + ")";
-						}
-						label.for = select.id;
-						row.insertCell(col_id).appendChild(label).appendChild(select);
-						select.setAttribute('onchange','processUserSelection(this);');
-						select.setAttribute('onblur','processPreviewSelection(this);');
-					}else{
-						select = document.createElement('input');
-						select.type = 'text';
-						select.id = cont.container_key;
-						select.value = cont.container_value;
-						
-						label = document.createElement('label');
-						label.type = 'label';
-						label.style = 'display:block';
-						label.innerHTML = cont.container_key + '<br>';
-						label.for = select.id;
-						row.insertCell(col_id).appendChild(label).appendChild(select);
-						select.setAttribute('onchange','processUserSelection(this);');
-						select.setAttribute('onblur','processPreviewSelection(this);');
-
-					}
-				}
+				if(dataToProcess) {
+				$('#event_stats_div').empty();
+	
+				div = document.createElement('div');
 				
-			});
-			row = tbody.insertRow(tbody.rows.length);
-			
-			select = document.createElement('input')
-			select.type = 'text';
-			select.id = 'file_name';
-			//select.value = '';
-			select.value = ($('#previous_xml_data option:selected').val()).replace('.xml','');
-			label = document.createElement('label');
-			label.type = 'label';
-			label.innerHTML = 'Save XML Files As';
-			label.for = select.id;
-			row.insertCell(0).appendChild(label).appendChild(select);
-			
-			select = document.createElement('button');
-			select.innerHTML = 'Save As';
-			select.id = 'save_button';
-			select.className = 'btn btn-success position-absolute top-0 start-50 translate-middle-x shadow-lg';
-	        select.style.padding = '4px 8px'; // Adjust padding
-	        select.style.fontSize = '16px'; // Font size
-	        select.style.borderRadius = '8px'; // Rounded corners
-	        select.style.transition = 'all 0.3s ease'; // Smooth transition
+				table = document.createElement('table');
+				table.setAttribute('class', 'table table-responsive');
+				
+				tbody = document.createElement('tbody');
+				
+				dataToProcess.containers.forEach(function(cont){
+					if(cont.container_key == 'scenePath'){
+					}else{
+						if(col_num_per_row % 4 == 0) {
+							row = tbody.insertRow(tbody.rows.length);
+							col_num_per_row = col_num_per_row + 1; // 7
+							col_id = 0; 
+						} else {
+							col_id = col_id + 1; // 2
+							col_num_per_row = col_num_per_row + 1; // 6
+						}
+						if(cont.container_key.includes('Logo') || cont.container_key.includes('Image')){
+							select = document.createElement('input')
+							select.type = 'file';
+							select.accept = 'image/*';
+							select.id = cont.container_key;
+							
+							label = document.createElement('label');
+							label.type = 'label';
+							label.style = 'display:block';
+							if(cont.container_value == ''){
+								label.innerHTML = cont.container_key;
+							}else{
+								label.innerHTML = cont.container_key + " (" + cont.container_value.split("Media/")[1].replace("DOAD_","") + ")";
+							}
+							label.for = select.id;
+							row.insertCell(col_id).appendChild(label).appendChild(select);
+							select.setAttribute('onchange','processUserSelection(this);');
+							select.setAttribute('onblur','processPreviewSelection(this);');
+						}else{
+							select = document.createElement('input');
+							select.type = 'text';
+							select.id = cont.container_key;
+							select.value = cont.container_value;
+							
+							label = document.createElement('label');
+							label.type = 'label';
+							label.style = 'display:block';
+							label.innerHTML = cont.container_key + '<br>';
+							label.for = select.id;
+							row.insertCell(col_id).appendChild(label).appendChild(select);
+							select.setAttribute('onchange','processUserSelection(this);');
+							select.setAttribute('onblur','processPreviewSelection(this);');
 	
-	        // Add hover effect 
-	        select.addEventListener('mouseover', function() {
-	            select.style.boxShadow = '0 8px #666'; // Increase shadow on hover
-	            select.style.transform = 'translateY(-4px)'; // Lift button on hover
-	        });
+						}
+					}
+					
+				});
+				row = tbody.insertRow(tbody.rows.length);
+				
+				select = document.createElement('input')
+				select.type = 'text';
+				select.id = 'file_name';
+				//select.value = '';
+				select.value = ($('#previous_xml_data option:selected').val()).replace('.xml','');
+				label = document.createElement('label');
+				label.type = 'label';
+				label.innerHTML = 'Save XML Files As';
+				label.for = select.id;
+				row.insertCell(0).appendChild(label).appendChild(select);
+				
+				select = document.createElement('button');
+				select.innerHTML = 'Save As';
+				select.id = 'save_button';
+				select.className = 'btn btn-success position-absolute top-0 start-50 translate-middle-x shadow-lg';
+		        select.style.padding = '4px 8px'; // Adjust padding
+		        select.style.fontSize = '16px'; // Font size
+		        select.style.borderRadius = '8px'; // Rounded corners
+		        select.style.transition = 'all 0.3s ease'; // Smooth transition
+		
+		        // Add hover effect 
+		        select.addEventListener('mouseover', function() {
+		            select.style.boxShadow = '0 8px #666'; // Increase shadow on hover
+		            select.style.transform = 'translateY(-4px)'; // Lift button on hover
+		        });
+		
+		        select.addEventListener('mouseout', function() {
+		            select.style.boxShadow = '0 4px #666'; // Restore shadow
+		            select.style.transform = 'translateY(0)'; // Restore button position
+		        });
 	
-	        select.addEventListener('mouseout', function() {
-	            select.style.boxShadow = '0 4px #666'; // Restore shadow
-	            select.style.transform = 'translateY(0)'; // Restore button position
-	        });
-
-			select.addEventListener('mouseout', function() {
-			    select.style.boxShadow = '0 4px #666'; // Restore shadow
-			    select.style.transform = 'translateY(0)'; // Restore button position
-			});
-			select.setAttribute('onclick','processUserSelection(this);');
-			row.insertCell(1).appendChild(select);
-
-
-			var cancelButton = document.createElement('button');
-			cancelButton.innerHTML = '<b>Cancel</b>';
-			cancelButton.id = 'cancel_graphics_btn';
-		 	cancelButton.className = 'btn btn-danger position-absolute top-0 start-50 translate-middle-x shadow-lg';
-	        cancelButton.style.padding = '4px 8px'; // Adjust padding
-	        cancelButton.style.fontSize = '16px'; // Font size
-	        cancelButton.style.borderRadius = '8px'; // Rounded corners
-	        cancelButton.style.transition = 'all 0.3s ease'; // Smooth transition
+				select.addEventListener('mouseout', function() {
+				    select.style.boxShadow = '0 4px #666'; // Restore shadow
+				    select.style.transform = 'translateY(0)'; // Restore button position
+				});
+				select.setAttribute('onclick','processUserSelection(this);');
+				row.insertCell(1).appendChild(select);
 	
-	        // Add hover effect using JavaScript
-	        cancelButton.addEventListener('mouseover', function() {
-	            cancelButton.style.boxShadow = '0 8px #666'; // Increase shadow on hover
-	            cancelButton.style.transform = 'translateY(-4px)'; // Lift button on hover
-	        });
 	
-	        cancelButton.addEventListener('mouseout', function() {
-	            cancelButton.style.boxShadow = '0 4px #666'; // Restore shadow
-	            cancelButton.style.transform = 'translateY(0)'; // Restore button position
-	        });
-			cancelButton.setAttribute('onclick', 'processUserSelection(this);');			
-			row.insertCell(2).appendChild(cancelButton);
-			table.appendChild(tbody);
-			
-			document.getElementById('event_stats_div').appendChild(table);
-			//document.getElementById('event_stats_div').style.display = '';
-			document.getElementById('main_div').style.height = 'auto';
-			document.getElementById('event_stats_div').style.display = 'block';
-		}
+				var cancelButton = document.createElement('button');
+				cancelButton.innerHTML = '<b>Cancel</b>';
+				cancelButton.id = 'cancel_graphics_btn';
+			 	cancelButton.className = 'btn btn-danger position-absolute top-0 start-50 translate-middle-x shadow-lg';
+		        cancelButton.style.padding = '4px 8px'; // Adjust padding
+		        cancelButton.style.fontSize = '16px'; // Font size
+		        cancelButton.style.borderRadius = '8px'; // Rounded corners
+		        cancelButton.style.transition = 'all 0.3s ease'; // Smooth transition
+		
+		        // Add hover effect using JavaScript
+		        cancelButton.addEventListener('mouseover', function() {
+		            cancelButton.style.boxShadow = '0 8px #666'; // Increase shadow on hover
+		            cancelButton.style.transform = 'translateY(-4px)'; // Lift button on hover
+		        });
+		
+		        cancelButton.addEventListener('mouseout', function() {
+		            cancelButton.style.boxShadow = '0 4px #666'; // Restore shadow
+		            cancelButton.style.transform = 'translateY(0)'; // Restore button position
+		        });
+				cancelButton.setAttribute('onclick', 'processUserSelection(this);');			
+				row.insertCell(2).appendChild(cancelButton);
+				table.appendChild(tbody);
+				
+				document.getElementById('event_stats_div').appendChild(table);
+				//document.getElementById('event_stats_div').style.display = '';
+				document.getElementById('main_div').style.height = 'auto';
+				document.getElementById('event_stats_div').style.display = 'block';
+			}
 			
 			break;
 		
