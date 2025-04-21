@@ -488,6 +488,7 @@ public class IndexController
 			@RequestParam(value = "valueToProcess", required = false, defaultValue = "") String valueToProcess) 
 					throws IOException, IllegalAccessException, InvocationTargetException, JAXBException, InterruptedException
 	{	
+		System.out.println(whatToProcess);
 		switch (whatToProcess.toUpperCase()) {
 		case "BUILD_CONNECTION":
 			print_writer = new PrintWriter(new Socket(session_Configurations.getIpAddressEverest(), 
@@ -527,6 +528,8 @@ public class IndexController
 					return JSONObject.fromObject(session_Data).toString();
 					
 				case "LOAD_DATA":
+					//Delete preview
+					new java.io.File("C:/Temp/Preview.png").delete();
 					
 					print_writer.println("LAYER1*EVEREST*GLOBAL TEMPLATE_SAVE " + 
 							ManualUtil.MANUAL_DIRECTORY + ManualUtil.CONTAINER_FILE + ";");
@@ -582,6 +585,9 @@ public class IndexController
 					return JSONObject.fromObject(session_Data).toString();
 					
 				case "LOAD_DATA":
+					//Delete preview
+					new java.io.File("C:/Temp/Preview.png").delete();
+					
 					print_writer.println("LAYER1*EVEREST*GLOBAL TEMPLATE_SAVE " + 
 							ManualUtil.MANUAL_DIRECTORY + ManualUtil.CONTAINER_FILE + ";");
 					TimeUnit.SECONDS.sleep(2);
@@ -608,6 +614,10 @@ public class IndexController
 				switch(whatToProcess.toUpperCase()) {
 				case "LOAD_CONTAINER":
 					imgdata.clear();
+					
+					//Delete preview
+					new java.io.File("C:/Temp/Preview.png").delete();
+					
 					is_previous_data = true;
 					if(session_Configurations.getIpAddressScenes().equalsIgnoreCase("localhost") || session_Configurations.getIpAddressScenes().equalsIgnoreCase("")) {
 						session_Data = (ContainerData)JAXBContext.newInstance(ContainerData.class).createUnmarshaller().unmarshal(
@@ -622,17 +632,16 @@ public class IndexController
 					
 					TimeUnit.SECONDS.sleep(2);
 					Scene = session_Data.getContainers().get(0).getContainer_value().split("Scenes/")[1];
-					if(session_Configurations.getIpAddressEverest().equalsIgnoreCase("localhost") || session_Configurations.getIpAddressScenes().equalsIgnoreCase("")) {
-						if(!session_Configurations.getIpAddressEverest().trim().isEmpty() && session_Configurations.getPortNumber() != 0) {
-							new Scene(session_Data.getContainers().get(0).getContainer_value()).
-							scene_load(print_writer,session_Data.getContainers().get(0).getContainer_value());
-						}
-						
-					}else {
-						new Scene(session_Data.getContainers().get(0).getContainer_value().replace("C:", "c")).
-								scene_load(print_writer,session_Data.getContainers().get(0).getContainer_value().replace("C:", "c"));
-					}
-					//ManualFunctions.Preview(Scene, print_writer);
+//					if(session_Configurations.getIpAddressEverest().equalsIgnoreCase("localhost") || session_Configurations.getIpAddressScenes().equalsIgnoreCase("")) {
+//						if(!session_Configurations.getIpAddressEverest().trim().isEmpty() && session_Configurations.getPortNumber() != 0) {
+//							new Scene(session_Data.getContainers().get(0).getContainer_value()).
+//							scene_load(print_writer,session_Data.getContainers().get(0).getContainer_value());
+//						}
+//						
+//					}else {
+//						new Scene(session_Data.getContainers().get(0).getContainer_value().replace("C:", "c")).
+//								scene_load(print_writer,session_Data.getContainers().get(0).getContainer_value().replace("C:", "c"));
+//					}
 					ManualFunctions.Preview(session_selected_sports,Scene, print_writer ,IsGraphicOnScreen);
 					
 					return JSONObject.fromObject(session_Data).toString();
@@ -663,16 +672,16 @@ public class IndexController
 						Collections.sort(session_Data.getContainers());
 						
 						if(whatToProcess.toUpperCase().equalsIgnoreCase("READ-DATA-AND-PREVIEW")) {
-//							if(session_Configurations.getIpAddressEverest().equalsIgnoreCase("localhost") || session_Configurations.getIpAddressScenes().equalsIgnoreCase("")) {
-//								if(!session_Configurations.getIpAddressEverest().trim().isEmpty() && session_Configurations.getPortNumber() != 0) {
-//									new Scene(session_Data.getContainers().get(0).getContainer_value()).
-//									scene_load(print_writer,session_Data.getContainers().get(0).getContainer_value());
-//								}
-//								
-//							}else {
-//								new Scene(session_Data.getContainers().get(0).getContainer_value().replace("C:", "c")).
-//										scene_load(print_writer,session_Data.getContainers().get(0).getContainer_value().replace("C:", "c"));
-//							}
+							if(session_Configurations.getIpAddressEverest().equalsIgnoreCase("localhost") || session_Configurations.getIpAddressScenes().equalsIgnoreCase("")) {
+								if(!session_Configurations.getIpAddressEverest().trim().isEmpty() && session_Configurations.getPortNumber() != 0) {
+									new Scene(session_Data.getContainers().get(0).getContainer_value()).
+									scene_load(print_writer,session_Data.getContainers().get(0).getContainer_value());
+								}
+								
+							}else {
+								new Scene(session_Data.getContainers().get(0).getContainer_value().replace("C:", "c")).
+										scene_load(print_writer,session_Data.getContainers().get(0).getContainer_value().replace("C:", "c"));
+							}
 						}
 						
 						for(int i = 1; i < session_Data.getContainers().size() ; i++) {
@@ -745,6 +754,9 @@ public class IndexController
 					return JSONObject.fromObject(session_Data).toString();
 					
 				case "LOAD_DATA":
+					//Delete preview
+					new java.io.File("C:/Temp/Preview.png").delete();
+					
 					imgdata.clear();
 			        // Check if the file exists
 			        if (file.exists()) {
