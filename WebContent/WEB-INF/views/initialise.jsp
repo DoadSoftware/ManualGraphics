@@ -252,10 +252,7 @@
                 <div class="form-group">
                     <label for="select_sports">Select Sport</label>
                     <select id="select_sports" name="select_sports" class="form-control">
-                        <option value="CRICKET">CRICKET</option>
-                        <option value="FOOTBALL">FOOTBALL</option>
-                        <option value="BADMINTON">BADMINTON</option>
-                        <option value="BASKETBALL">BASKETBALL</option>
+                        <option value="DOAD">DOAD</option>
                     </select>
                 </div>
                 <button type="submit" class="btn-submit">

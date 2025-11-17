@@ -5,15 +5,25 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
@@ -25,6 +35,7 @@ import javax.xml.bind.JAXBException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -53,6 +64,8 @@ public class IndexController
 	public static Configurations session_Configurations;
 	public static PrintWriter print_writer;
 	public static ContainerData session_Data;
+	public static String expiry_date = "2025-11-21";
+	public static String current_date;
 	String session_selected_sports,session_selected_PreviewIp;
 	String Data;
 	String Scene;
@@ -64,8 +77,14 @@ public class IndexController
 	    return "contact"; // Loads contact.jsp
 	}
 	@RequestMapping(value = {"/","/initialise"}, method={RequestMethod.GET,RequestMethod.POST}) 
-	public String initialisePage(ModelMap model) throws JAXBException  
+	public String initialisePage(ModelMap model,
+			@ModelAttribute("expiryDate") String expiryDate) throws JAXBException, MalformedURLException, IOException  
 	{
+		
+		if(current_date == null || current_date.isEmpty()) {
+			current_date = getOnlineCurrentDate();
+		}
+		
 		if(new File(ManualUtil.CONFIGURATION_DIRECTORY + ManualUtil.OUTPUT_XML).exists()) {
 			session_Configurations = (Configurations)JAXBContext.newInstance(Configurations.class).createUnmarshaller().unmarshal(
 					new File(ManualUtil.CONFIGURATION_DIRECTORY  + ManualUtil.OUTPUT_XML));
@@ -81,47 +100,51 @@ public class IndexController
 
 	@RequestMapping(value = {"/manual"}, method={RequestMethod.GET,RequestMethod.POST}) 
 	public String manualPage(ModelMap model, MultipartHttpServletRequest request,
+			@ModelAttribute("expiryDate") String expiryDate,
 			@RequestParam(value = "select_sports", required = false, defaultValue = "") String select_sports,
 			@RequestParam(value = "vizIPAddressEverest", required = false, defaultValue = "") String vizIPAddressEverest,
 			@RequestParam(value = "vizIPAddressScenes", required = false, defaultValue = "") String vizIPAddressScenes,
 			@RequestParam(value = "vizPortNumber", required = false, defaultValue = "") int vizPortNumber)
-			throws UnknownHostException,JAXBException, IOException,IllegalAccessException,InvocationTargetException, URISyntaxException
+			throws UnknownHostException,JAXBException, IOException,IllegalAccessException,InvocationTargetException, URISyntaxException, ParseException
 	{
-		session_selected_sports = select_sports;
-		session_selected_PreviewIp = vizIPAddressEverest;
 		
-		if(!vizIPAddressEverest.trim().isEmpty() && vizPortNumber != 0) {
-			session_socket = new Socket(vizIPAddressEverest, Integer.valueOf(vizPortNumber));
-			print_writer = new PrintWriter(session_socket.getOutputStream(), true);
-		}
-		
-		session_Configurations = new Configurations(vizIPAddressEverest,vizIPAddressScenes, vizPortNumber);
-		
-		JAXBContext.newInstance(Configurations.class).createMarshaller().marshal(session_Configurations, 
-				new File(ManualUtil.CONFIGURATION_DIRECTORY + ManualUtil.OUTPUT_XML));
-		
-		switch(session_selected_sports) {
-		case "BADMINTON":
-			model.addAttribute("session_viz_scenes", new File(ManualUtil.BADMINTON_SCENE_DIRECTORY + 
-					ManualUtil.SCENES_DIRECTORY).listFiles(new FileFilter() {
-				@Override
-			    public boolean accept(File pathname) {
-			        String name = pathname.getName().toLowerCase();
-			        return name.endsWith(".sum") && pathname.isFile();
-			    }
-			}));
+		if(current_date == null || current_date.isEmpty()) {
 			
-			model.addAttribute("scene_files", new File(ManualUtil.MANUAL_DIRECTORY + ManualUtil.DATA_DIRECTORY).listFiles(new FileFilter() {
-				@Override
-			    public boolean accept(File pathname) {
-			        String name = pathname.getName().toLowerCase();
-			        return name.endsWith(".xml") && pathname.isFile();
-			    }
-			}));
-			break;
-		case "BASKETBALL":
+			model.addAttribute("error_message","You must be connected to the internet online");
+			return "error";
+		
+		} else if(new SimpleDateFormat("yyyy-MM-dd").parse(expiry_date).before(new SimpleDateFormat("yyyy-MM-dd").parse(current_date))) {
+			
+			model.addAttribute("error_message","This software has expired");
+			return "error";
+			
+		}else {
+			
+			DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+			
+			LocalDate date1 = LocalDate.parse(current_date, dtf);
+			LocalDate date2 = LocalDate.parse(expiry_date, dtf);
+			
+			long daysBetween = ChronoUnit.DAYS.between(date1, date2);
+			
+			expiryDate = String.valueOf(daysBetween);
+			
+			session_selected_sports = select_sports;
+			session_selected_PreviewIp = vizIPAddressEverest;
+			
+			if(!vizIPAddressEverest.trim().isEmpty() && vizPortNumber != 0) {
+				session_socket = new Socket(vizIPAddressEverest, Integer.valueOf(vizPortNumber));
+				print_writer = new PrintWriter(session_socket.getOutputStream(), true);
+			}
+			
+			session_Configurations = new Configurations(vizIPAddressEverest,vizIPAddressScenes, vizPortNumber);
+			
+			JAXBContext.newInstance(Configurations.class).createMarshaller().marshal(session_Configurations, 
+					new File(ManualUtil.CONFIGURATION_DIRECTORY + ManualUtil.OUTPUT_XML));
+			
+			
 			if(session_Configurations.getIpAddressScenes().equalsIgnoreCase("localhost") || session_Configurations.getIpAddressScenes().equalsIgnoreCase("")) {
-				model.addAttribute("session_viz_scenes", new File(ManualUtil.BASKETBALL_SCENE_DIRECTORY + ManualUtil.SCENES_DIRECTORY).listFiles(new FileFilter() {
+				model.addAttribute("session_viz_scenes", new File(ManualUtil.SCENE_DIRECTORY + ManualUtil.SCENES_DIRECTORY).listFiles(new FileFilter() {
 					@Override
 				    public boolean accept(File pathname) {
 				        String name = pathname.getName().toLowerCase();
@@ -137,7 +160,7 @@ public class IndexController
 				    }
 				}));
 			}else {
-				model.addAttribute("session_viz_scenes", new File("//" + session_Configurations.getIpAddressScenes() + "//" + ManualUtil.BASKETBALL_SCENE_DIRECTORY.replace("C:", "c") + ManualUtil.SCENES_DIRECTORY).listFiles(new FileFilter() {
+				model.addAttribute("session_viz_scenes", new File("//" + session_Configurations.getIpAddressScenes() + "//" + ManualUtil.SCENE_DIRECTORY.replace("C:", "c") + ManualUtil.SCENES_DIRECTORY).listFiles(new FileFilter() {
 					@Override
 				    public boolean accept(File pathname) {
 				        String name = pathname.getName().toLowerCase();
@@ -153,184 +176,76 @@ public class IndexController
 				    }
 				}));
 			}
-			
-			break;
-		case "CRICKET":
-			if(session_Configurations.getIpAddressScenes().equalsIgnoreCase("localhost") || session_Configurations.getIpAddressScenes().equalsIgnoreCase("")) {
-				model.addAttribute("session_viz_scenes", new File(ManualUtil.CRICKET_SCENE_DIRECTORY + ManualUtil.SCENES_DIRECTORY).listFiles(new FileFilter() {
-					@Override
-				    public boolean accept(File pathname) {
-				        String name = pathname.getName().toLowerCase();
-				        return name.endsWith(".sum") && pathname.isFile();
-				    }
-				}));
 				
-				model.addAttribute("scene_files", new File(ManualUtil.MANUAL_DIRECTORY + ManualUtil.DATA_DIRECTORY).listFiles(new FileFilter() {
-					@Override
-				    public boolean accept(File pathname) {
-				        String name = pathname.getName().toLowerCase();
-				        return name.endsWith(".xml") && pathname.isFile();
-				    }
-				}));
-			}else {
-				model.addAttribute("session_viz_scenes", new File("//" + session_Configurations.getIpAddressScenes() + "//" + ManualUtil.CRICKET_SCENE_DIRECTORY.replace("C:", "c") + ManualUtil.SCENES_DIRECTORY).listFiles(new FileFilter() {
-					@Override
-				    public boolean accept(File pathname) {
-				        String name = pathname.getName().toLowerCase();
-				        return name.endsWith(".sum") && pathname.isFile();
-				    }
-				}));
-				
-				model.addAttribute("scene_files", new File("//" + session_Configurations.getIpAddressScenes() + "//" + ManualUtil.MANUAL_DIRECTORY.replace("C:", "c") + ManualUtil.DATA_DIRECTORY).listFiles(new FileFilter() {
-					@Override
-				    public boolean accept(File pathname) {
-				        String name = pathname.getName().toLowerCase();
-				        return name.endsWith(".xml") && pathname.isFile();
-				    }
-				}));
-			}
-			
-			break;
-		case "FOOTBALL":
-			model.addAttribute("session_viz_scenes", new File(ManualUtil.FOOTBALL_SCENE_DIRECTORY + ManualUtil.SCENES_DIRECTORY).listFiles(new FileFilter() {
-				@Override
-			    public boolean accept(File pathname) {
-			        String name = pathname.getName().toLowerCase();
-			        return name.endsWith(".sum") && pathname.isFile();
-			    }
-			}));
-			
-			model.addAttribute("scene_files", new File(ManualUtil.MANUAL_DIRECTORY + ManualUtil.DATA_DIRECTORY).listFiles(new FileFilter() {
-				@Override
-			    public boolean accept(File pathname) {
-			        String name = pathname.getName().toLowerCase();
-			        return name.endsWith(".xml") && pathname.isFile();
-			    }
-			}));
-			break;	
+			model.addAttribute("session_selected_sports", session_selected_sports);
+			model.addAttribute("session_Data", session_Data);
+			return "manual";
 		}
-		
-		model.addAttribute("session_selected_sports", session_selected_sports);
-		model.addAttribute("session_Data", session_Data);
-		return "manual";
 	}
 	
 	@RequestMapping(value = {"/back_to_manual"}, method={RequestMethod.GET,RequestMethod.POST}) 
-	public String backToManualPage(ModelMap model)
+	public String backToManualPage(ModelMap model,
+			@ModelAttribute("expiryDate") String expiryDate) throws ParseException
 	{
-		switch(session_selected_sports) {
-		case "BADMINTON":
-			model.addAttribute("session_viz_scenes", new File(ManualUtil.BADMINTON_SCENE_DIRECTORY + 
-					ManualUtil.SCENES_DIRECTORY).listFiles(new FileFilter() {
-				@Override
-			    public boolean accept(File pathname) {
-			        String name = pathname.getName().toLowerCase();
-			        return name.endsWith(".sum") && pathname.isFile();
-			    }
-			}));
+		if(current_date == null || current_date.isEmpty()) {
 			
-			model.addAttribute("scene_files", new File(ManualUtil.MANUAL_DIRECTORY + ManualUtil.DATA_DIRECTORY).listFiles(new FileFilter() {
-				@Override
-			    public boolean accept(File pathname) {
-			        String name = pathname.getName().toLowerCase();
-			        return name.endsWith(".xml") && pathname.isFile();
-			    }
-			}));
-			break;
-		case "BASKETBALL":
-			if(session_Configurations.getIpAddressScenes().equalsIgnoreCase("localhost") || session_Configurations.getIpAddressScenes().equalsIgnoreCase("")) {
-				model.addAttribute("session_viz_scenes", new File(ManualUtil.BASKETBALL_SCENE_DIRECTORY + ManualUtil.SCENES_DIRECTORY).listFiles(new FileFilter() {
-					@Override
-				    public boolean accept(File pathname) {
-				        String name = pathname.getName().toLowerCase();
-				        return name.endsWith(".sum") && pathname.isFile();
-				    }
-				}));
-				
-				model.addAttribute("scene_files", new File(ManualUtil.MANUAL_DIRECTORY + ManualUtil.DATA_DIRECTORY).listFiles(new FileFilter() {
-					@Override
-				    public boolean accept(File pathname) {
-				        String name = pathname.getName().toLowerCase();
-				        return name.endsWith(".xml") && pathname.isFile();
-				    }
-				}));
-			}else {
-				model.addAttribute("session_viz_scenes", new File("//" + session_Configurations.getIpAddressScenes() + "//" + ManualUtil.BASKETBALL_SCENE_DIRECTORY.replace("C:", "c") + ManualUtil.SCENES_DIRECTORY).listFiles(new FileFilter() {
-					@Override
-				    public boolean accept(File pathname) {
-				        String name = pathname.getName().toLowerCase();
-				        return name.endsWith(".sum") && pathname.isFile();
-				    }
-				}));
-				
-				model.addAttribute("scene_files", new File("//" + session_Configurations.getIpAddressScenes() + "//" + ManualUtil.MANUAL_DIRECTORY.replace("C:", "c") + ManualUtil.DATA_DIRECTORY).listFiles(new FileFilter() {
-					@Override
-				    public boolean accept(File pathname) {
-				        String name = pathname.getName().toLowerCase();
-				        return name.endsWith(".xml") && pathname.isFile();
-				    }
-				}));
-			}
-			
-			break;
-		case "CRICKET":
-			if(session_Configurations.getIpAddressScenes().equalsIgnoreCase("localhost") || session_Configurations.getIpAddressScenes().equalsIgnoreCase("")) {
-				model.addAttribute("session_viz_scenes", new File(ManualUtil.CRICKET_SCENE_DIRECTORY + ManualUtil.SCENES_DIRECTORY).listFiles(new FileFilter() {
-					@Override
-				    public boolean accept(File pathname) {
-				        String name = pathname.getName().toLowerCase();
-				        return name.endsWith(".sum") && pathname.isFile();
-				    }
-				}));
-				
-				model.addAttribute("scene_files", new File(ManualUtil.MANUAL_DIRECTORY + ManualUtil.DATA_DIRECTORY).listFiles(new FileFilter() {
-					@Override
-				    public boolean accept(File pathname) {
-				        String name = pathname.getName().toLowerCase();
-				        return name.endsWith(".xml") && pathname.isFile();
-				    }
-				}));
-			}else {
-				model.addAttribute("session_viz_scenes", new File("//" + session_Configurations.getIpAddressScenes() + "//" + ManualUtil.CRICKET_SCENE_DIRECTORY.replace("C:", "c") + ManualUtil.SCENES_DIRECTORY).listFiles(new FileFilter() {
-					@Override
-				    public boolean accept(File pathname) {
-				        String name = pathname.getName().toLowerCase();
-				        return name.endsWith(".sum") && pathname.isFile();
-				    }
-				}));
-				
-				model.addAttribute("scene_files", new File("//" + session_Configurations.getIpAddressScenes() + "//" + ManualUtil.MANUAL_DIRECTORY.replace("C:", "c") + ManualUtil.DATA_DIRECTORY).listFiles(new FileFilter() {
-					@Override
-				    public boolean accept(File pathname) {
-				        String name = pathname.getName().toLowerCase();
-				        return name.endsWith(".xml") && pathname.isFile();
-				    }
-				}));
-			}
-			
-			break;
-		case "FOOTBALL":
-			model.addAttribute("session_viz_scenes", new File(ManualUtil.FOOTBALL_SCENE_DIRECTORY + ManualUtil.SCENES_DIRECTORY).listFiles(new FileFilter() {
-				@Override
-			    public boolean accept(File pathname) {
-			        String name = pathname.getName().toLowerCase();
-			        return name.endsWith(".sum") && pathname.isFile();
-			    }
-			}));
-			
-			model.addAttribute("scene_files", new File(ManualUtil.MANUAL_DIRECTORY + ManualUtil.DATA_DIRECTORY).listFiles(new FileFilter() {
-				@Override
-			    public boolean accept(File pathname) {
-			        String name = pathname.getName().toLowerCase();
-			        return name.endsWith(".xml") && pathname.isFile();
-			    }
-			}));
-			break;	
-		}
+			model.addAttribute("error_message","You must be connected to the internet online");
+			return "error";
 		
-		model.addAttribute("session_selected_sports", session_selected_sports);
-		model.addAttribute("session_Data", session_Data);
-		return "manual";
+		} else if(new SimpleDateFormat("yyyy-MM-dd").parse(expiry_date).before(new SimpleDateFormat("yyyy-MM-dd").parse(current_date))) {
+			
+			model.addAttribute("error_message","This software has expired");
+			return "error";
+			
+		}else {
+			
+			DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+			
+			LocalDate date1 = LocalDate.parse(current_date, dtf);
+			LocalDate date2 = LocalDate.parse(expiry_date, dtf);
+			
+			long daysBetween = ChronoUnit.DAYS.between(date1, date2);
+			
+			expiryDate = String.valueOf(daysBetween);
+			
+			if(session_Configurations.getIpAddressScenes().equalsIgnoreCase("localhost") || session_Configurations.getIpAddressScenes().equalsIgnoreCase("")) {
+				model.addAttribute("session_viz_scenes", new File(ManualUtil.SCENE_DIRECTORY + ManualUtil.SCENES_DIRECTORY).listFiles(new FileFilter() {
+					@Override
+				    public boolean accept(File pathname) {
+				        String name = pathname.getName().toLowerCase();
+				        return name.endsWith(".sum") && pathname.isFile();
+				    }
+				}));
+				
+				model.addAttribute("scene_files", new File(ManualUtil.MANUAL_DIRECTORY + ManualUtil.DATA_DIRECTORY).listFiles(new FileFilter() {
+					@Override
+				    public boolean accept(File pathname) {
+				        String name = pathname.getName().toLowerCase();
+				        return name.endsWith(".xml") && pathname.isFile();
+				    }
+				}));
+			}else {
+				model.addAttribute("session_viz_scenes", new File("//" + session_Configurations.getIpAddressScenes() + "//" + ManualUtil.SCENE_DIRECTORY.replace("C:", "c") + ManualUtil.SCENES_DIRECTORY).listFiles(new FileFilter() {
+					@Override
+				    public boolean accept(File pathname) {
+				        String name = pathname.getName().toLowerCase();
+				        return name.endsWith(".sum") && pathname.isFile();
+				    }
+				}));
+				
+				model.addAttribute("scene_files", new File("//" + session_Configurations.getIpAddressScenes() + "//" + ManualUtil.MANUAL_DIRECTORY.replace("C:", "c") + ManualUtil.DATA_DIRECTORY).listFiles(new FileFilter() {
+					@Override
+				    public boolean accept(File pathname) {
+				        String name = pathname.getName().toLowerCase();
+				        return name.endsWith(".xml") && pathname.isFile();
+				    }
+				}));
+			}
+			
+			model.addAttribute("session_selected_sports", session_selected_sports);
+			model.addAttribute("session_Data", session_Data);
+			return "manual";
+		}
 	}
 	
 	@RequestMapping(value = {"/save_data","/uploadFileToManual","/preview"}, method={RequestMethod.GET,RequestMethod.POST})
@@ -341,7 +256,6 @@ public class IndexController
 		MultipartFile mpf;
 		String whichFile = "",file_name = "";
 			if (request.getRequestURI().contains("save_data")||request.getRequestURI().contains("preview")) {
-				
 				List<Container> containers = new ArrayList<Container>();
 				containers.clear();
 				for (Entry<String, String[]> entry : request.getParameterMap().entrySet()) {
@@ -359,10 +273,9 @@ public class IndexController
 							}
 						}
 					}
-					else if(entry.getKey().contains("Logo") || entry.getKey().contains("Image")) {
+					else if(entry.getKey().contains("Logo")||entry.getKey().contains("Sponsor") || entry.getKey().contains("Image")) {
 						if(imgdata.size() > 0) {
 							for(int i=0;i<imgdata.size();i++) {
-								
 								if(imgdata.get(i).getImageId().equalsIgnoreCase(entry.getKey())) {
 									containers.add(new Container(Integer.valueOf(entry.getKey().split("_")[0]), entry.getKey(), imgdata.get(i).getImagePath()));
 									break;
@@ -394,40 +307,19 @@ public class IndexController
 				}
 				Collections.sort(containers);
 				if(request.getRequestURI().contains("save_data")) {
-					switch (session_selected_sports) {
-					case "BADMINTON":
-						JAXBContext.newInstance(ContainerData.class).createMarshaller().marshal(new ContainerData(containers), 
-								new File(ManualUtil.MANUAL_DIRECTORY + 
-										ManualUtil.DATA_DIRECTORY + file_name + ManualUtil.XML));
-						break;
-					case "CRICKET":case "BASKETBALL":
-//						if(session_Configurations.getIpAddressScenes().equalsIgnoreCase("localhost") || session_Configurations.getIpAddressScenes().equalsIgnoreCase("")) {
-//							JAXBContext.newInstance(ContainerData.class).createMarshaller().marshal(new ContainerData(containers), 
-//									new File(ManualUtil.MANUAL_DIRECTORY + 
-//											ManualUtil.DATA_DIRECTORY + file_name + ManualUtil.XML));
-//						}else {
-//							JAXBContext.newInstance(ContainerData.class).createMarshaller().marshal(new ContainerData(containers), 
-//									new File("//" + session_Configurations.getIpAddressScenes() + "//" +
-//											ManualUtil.MANUAL_DIRECTORY.replace("C:", "c") + ManualUtil.DATA_DIRECTORY + file_name + ManualUtil.XML));
-//						}
-						String basePath = session_Configurations.getIpAddressScenes().equalsIgnoreCase("localhost") || 
-		                  session_Configurations.getIpAddressScenes().equalsIgnoreCase("") 
-		                  ? ManualUtil.MANUAL_DIRECTORY + ManualUtil.DATA_DIRECTORY 
-		                  : "//" + session_Configurations.getIpAddressScenes() + "//" + 
-		                    ManualUtil.MANUAL_DIRECTORY.replace("C:", "c") + ManualUtil.DATA_DIRECTORY;
+					
+					String basePath = session_Configurations.getIpAddressScenes().equalsIgnoreCase("localhost") || 
+	                  session_Configurations.getIpAddressScenes().equalsIgnoreCase("") 
+	                  ? ManualUtil.MANUAL_DIRECTORY + ManualUtil.DATA_DIRECTORY 
+	                  : "//" + session_Configurations.getIpAddressScenes() + "//" + 
+	                    ManualUtil.MANUAL_DIRECTORY.replace("C:", "c") + ManualUtil.DATA_DIRECTORY;
 
-						File Xmlfile = new File(basePath + file_name + ManualUtil.XML);
-						File parentDir = Xmlfile.getParentFile();
-						if (!parentDir.exists()) parentDir.mkdirs();
-				
-						JAXBContext.newInstance(ContainerData.class).createMarshaller().marshal(new ContainerData(containers), Xmlfile);
-						break;
-					case "FOOTBALL":
-						JAXBContext.newInstance(ContainerData.class).createMarshaller().marshal(new ContainerData(containers), 
-								new File(ManualUtil.MANUAL_DIRECTORY + 
-										ManualUtil.DATA_DIRECTORY + file_name + ManualUtil.XML));
-						break;	
-					}
+					File Xmlfile = new File(basePath + file_name + ManualUtil.XML);
+					File parentDir = Xmlfile.getParentFile();
+					if (!parentDir.exists()) parentDir.mkdirs();
+			
+					JAXBContext.newInstance(ContainerData.class).createMarshaller().marshal(new ContainerData(containers), Xmlfile);	
+					
 				}else if (request.getRequestURI().contains("preview")) {
 					for(int i = 1; i < containers.size() ; i++) {
 						if(!session_Configurations.getIpAddressEverest().trim().isEmpty() && session_Configurations.getPortNumber() != 0) {
@@ -488,7 +380,6 @@ public class IndexController
 			@RequestParam(value = "valueToProcess", required = false, defaultValue = "") String valueToProcess) 
 					throws IOException, IllegalAccessException, InvocationTargetException, JAXBException, InterruptedException
 	{	
-		System.out.println(whatToProcess);
 		switch (whatToProcess.toUpperCase()) {
 		case "BUILD_CONNECTION":
 			print_writer = new PrintWriter(new Socket(session_Configurations.getIpAddressEverest(), 
@@ -496,268 +387,191 @@ public class IndexController
 			return null;
 		case "LOAD_SCENE": case "LOAD_DATA": case "CHECK_CONNECTION":case "LOAD_PREVIOUS_SCENE": case "ANIMATE-OUT": case "ANIMATE-IN": case "CLEAR-ALL": case "BADMINTON-OPTIONS": 
 		case "READ-DATA-AND-PREVIEW": case "LOAD_CONTAINER": case "PREVIEW":case "MATCH_PREVIEW":case"PREVIEW_IMAGE_DATA":
-			switch (session_selected_sports) {
-			
-			case "BADMINTON":
-				switch(whatToProcess.toUpperCase()) {
-				case "LOAD_PREVIOUS_SCENE":
-					IsGraphicOnScreen = false;
-					new Scene(ManualUtil.BADMINTON_SCENE_DIRECTORY + ManualUtil.SCENES_DIRECTORY + Scene).
-						scene_load(print_writer,ManualUtil.BADMINTON_SCENE_DIRECTORY + ManualUtil.SCENES_DIRECTORY + Scene);
-					break;
-				case "LOAD_SCENE":
-					Scene = valueToProcess;
-					IsGraphicOnScreen = false;
-					new Scene(ManualUtil.BADMINTON_SCENE_DIRECTORY + ManualUtil.SCENES_DIRECTORY + valueToProcess).
-						scene_load(print_writer,ManualUtil.BADMINTON_SCENE_DIRECTORY + ManualUtil.SCENES_DIRECTORY + valueToProcess);
-					break;
-				}
-				switch (whatToProcess.toUpperCase()) {
-				case "LOAD_PREVIOUS_SCENE":
+			switch(whatToProcess.toUpperCase()) {
+			case "LOAD_CONTAINER":
+				imgdata.clear();
+				
+				//Delete preview
+				new java.io.File("C:/Temp/Preview.png").delete();
+				
+				is_previous_data = true;
+				if(session_Configurations.getIpAddressScenes().equalsIgnoreCase("localhost") || session_Configurations.getIpAddressScenes().equalsIgnoreCase("")) {
 					session_Data = (ContainerData)JAXBContext.newInstance(ContainerData.class).createUnmarshaller().unmarshal(
 							new File(ManualUtil.MANUAL_DIRECTORY + ManualUtil.DATA_DIRECTORY + valueToProcess));
-					Collections.sort(session_Data.getContainers());
-					
-					for(int i = 0; i < session_Data.getContainers().size(); i++) {
-					
-						print_writer.println("LAYER1*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET " + session_Data.getContainers().get(i).getContainer_key().replaceFirst((i+1)
-								+"_", "") + " " + session_Data.getContainers().get(i).getContainer_value() + ";");
-						
-					}
-					ManualFunctions.Preview(session_selected_sports,Scene, print_writer, IsGraphicOnScreen);
-					return JSONObject.fromObject(session_Data).toString();
-					
-				case "LOAD_DATA":
-					//Delete preview
-					new java.io.File("C:/Temp/Preview.png").delete();
-					
-					print_writer.println("LAYER1*EVEREST*GLOBAL TEMPLATE_SAVE " + 
-							ManualUtil.MANUAL_DIRECTORY + ManualUtil.CONTAINER_FILE + ";");
-					TimeUnit.SECONDS.sleep(2);
-					boolean exitLoop = false; int numberOfAttempts = 5;
-					List<String> allLines = new ArrayList<String>();
-					while (exitLoop == false){
-						if(new File(ManualUtil.MANUAL_DIRECTORY + ManualUtil.CONTAINER_FILE).exists()) {
-							allLines = Files.readAllLines(Paths.get(ManualUtil.MANUAL_DIRECTORY + ManualUtil.CONTAINER_FILE));
-							break;
-						} else {
-							TimeUnit.SECONDS.sleep(1);
-							numberOfAttempts = numberOfAttempts - 1;
-						}
-						if(numberOfAttempts <= 0)
-						{
-							break;
-						}
-					}
-					return JSONArray.fromObject(allLines).toString();
-				}
-				break;
-				
-			case "FOOTBALL":
-				switch(whatToProcess.toUpperCase()) {
-				case "LOAD_PREVIOUS_SCENE":
-					IsGraphicOnScreen = false;
-					new Scene(ManualUtil.FOOTBALL_SCENE_DIRECTORY + ManualUtil.SCENES_DIRECTORY + Scene).
-						scene_load(print_writer,ManualUtil.FOOTBALL_SCENE_DIRECTORY + ManualUtil.SCENES_DIRECTORY + Scene);
-					break;
-				case "LOAD_SCENE":
-					IsGraphicOnScreen = false;
-					Scene = valueToProcess;
-					new Scene(ManualUtil.FOOTBALL_SCENE_DIRECTORY + ManualUtil.SCENES_DIRECTORY + valueToProcess).
-						scene_load(print_writer,ManualUtil.FOOTBALL_SCENE_DIRECTORY + ManualUtil.SCENES_DIRECTORY + valueToProcess);
-					break;
-				}
-				switch (whatToProcess.toUpperCase()) {
-				case "LOAD_PREVIOUS_SCENE":
-					IsGraphicOnScreen = false;
-					print_writer.println("LAYER1*EVEREST*STAGE*DIRECTOR*Out SHOW 0.0;");
-					print_writer.println("LAYER1*EVEREST*STAGE*DIRECTOR*In SHOW 0.0;");
+				}else {
 					session_Data = (ContainerData)JAXBContext.newInstance(ContainerData.class).createUnmarshaller().unmarshal(
-							new File(ManualUtil.MANUAL_DIRECTORY + ManualUtil.DATA_DIRECTORY + valueToProcess));
-					Collections.sort(session_Data.getContainers());
-					
-					for(int i = 0; i < session_Data.getContainers().size(); i++) {
-						print_writer.println("LAYER1*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET " + session_Data.getContainers().get(i).getContainer_key().replaceFirst((i+1)
-								+"_", "") + " " + session_Data.getContainers().get(i).getContainer_value() + ";");
-					}
-					//Scene = session_Data.getContainers().get(0).getContainer_value().split("Scenes/")[1];
-					ManualFunctions.Preview(session_selected_sports,Scene, print_writer,IsGraphicOnScreen);
-					return JSONObject.fromObject(session_Data).toString();
-					
-				case "LOAD_DATA":
-					//Delete preview
-					new java.io.File("C:/Temp/Preview.png").delete();
-					
-					print_writer.println("LAYER1*EVEREST*GLOBAL TEMPLATE_SAVE " + 
-							ManualUtil.MANUAL_DIRECTORY + ManualUtil.CONTAINER_FILE + ";");
-					TimeUnit.SECONDS.sleep(2);
-					boolean exitLoop = false; int numberOfAttempts = 5;
-					List<String> allLines = new ArrayList<String>();
-					while (exitLoop == false){
-						if(new File(ManualUtil.MANUAL_DIRECTORY + ManualUtil.CONTAINER_FILE).exists()) {
-							allLines = Files.readAllLines(Paths.get(ManualUtil.MANUAL_DIRECTORY + ManualUtil.CONTAINER_FILE));
-							break;
-						} else {
-							TimeUnit.SECONDS.sleep(1);
-							numberOfAttempts = numberOfAttempts - 1;
-						}
-						if(numberOfAttempts <= 0)
-						{
-							break;
-						}
-					}
-					return JSONArray.fromObject(allLines).toString();
+							new File("//" + session_Configurations.getIpAddressScenes() + "//" + 
+									ManualUtil.MANUAL_DIRECTORY.replace("C:", "c") + ManualUtil.DATA_DIRECTORY + valueToProcess));
 				}
-				break;
 				
-			case "CRICKET":case "BASKETBALL":
-				switch(whatToProcess.toUpperCase()) {
-				case "LOAD_CONTAINER":
-					imgdata.clear();
+				Collections.sort(session_Data.getContainers());
+				
+				TimeUnit.SECONDS.sleep(2);
+				Scene = session_Data.getContainers().get(0).getContainer_value().split("Scenes/")[1];
+				if(session_Configurations.getIpAddressEverest().equalsIgnoreCase("localhost") || session_Configurations.getIpAddressScenes().equalsIgnoreCase("")) {
+					if(!session_Configurations.getIpAddressEverest().trim().isEmpty() && session_Configurations.getPortNumber() != 0) {
+						new Scene(session_Data.getContainers().get(0).getContainer_value()).
+						scene_load(print_writer,session_Data.getContainers().get(0).getContainer_value());
+					}
 					
-					//Delete preview
-					new java.io.File("C:/Temp/Preview.png").delete();
+				}else {
+					new Scene(session_Data.getContainers().get(0).getContainer_value().replace("C:", "c")).
+							scene_load(print_writer,session_Data.getContainers().get(0).getContainer_value().replace("C:", "c"));
+				}
+				ManualFunctions.Preview(session_selected_sports,Scene, print_writer ,IsGraphicOnScreen);
+				
+				return JSONObject.fromObject(session_Data).toString();
+		
+			case "READ-DATA-AND-PREVIEW": case "PREVIEW":
+				imgdata.clear();
+				if(valueToProcess.equalsIgnoreCase("BLANK")) {
+					return JSONObject.fromObject(session_Data).toString();
+				}else {
+					if(whatToProcess.toUpperCase().equalsIgnoreCase("READ-DATA-AND-PREVIEW")) {
+						is_previous_data = true;
+					}
 					
-					is_previous_data = true;
+					if(whatToProcess.toUpperCase().equalsIgnoreCase("PREVIEW")) {
+						valueToProcess = valueToProcess.replace(".sum", ".xml");
+					}
+					//TimeUnit.SECONDS.sleep(3);
+					
 					if(session_Configurations.getIpAddressScenes().equalsIgnoreCase("localhost") || session_Configurations.getIpAddressScenes().equalsIgnoreCase("")) {
 						session_Data = (ContainerData)JAXBContext.newInstance(ContainerData.class).createUnmarshaller().unmarshal(
 								new File(ManualUtil.MANUAL_DIRECTORY + ManualUtil.DATA_DIRECTORY + valueToProcess));
 					}else {
 						session_Data = (ContainerData)JAXBContext.newInstance(ContainerData.class).createUnmarshaller().unmarshal(
-								new File("//" + session_Configurations.getIpAddressScenes() + "//" + 
+								new File("//" + session_Configurations.getIpAddressScenes() + "//" +
 										ManualUtil.MANUAL_DIRECTORY.replace("C:", "c") + ManualUtil.DATA_DIRECTORY + valueToProcess));
 					}
 					
 					Collections.sort(session_Data.getContainers());
 					
+					if(whatToProcess.toUpperCase().equalsIgnoreCase("READ-DATA-AND-PREVIEW")) {
+						if(session_Configurations.getIpAddressEverest().equalsIgnoreCase("localhost") || session_Configurations.getIpAddressScenes().equalsIgnoreCase("")) {
+							if(!session_Configurations.getIpAddressEverest().trim().isEmpty() && session_Configurations.getPortNumber() != 0) {
+								new Scene(session_Data.getContainers().get(0).getContainer_value()).
+								scene_load(print_writer,session_Data.getContainers().get(0).getContainer_value());
+							}
+							
+						}else {
+							new Scene(session_Data.getContainers().get(0).getContainer_value().replace("C:", "c")).
+									scene_load(print_writer,session_Data.getContainers().get(0).getContainer_value().replace("C:", "c"));
+						}
+					}
+					
+					for(int i = 1; i < session_Data.getContainers().size() ; i++) {
+						if(!session_Configurations.getIpAddressEverest().trim().isEmpty() && session_Configurations.getPortNumber() != 0) {
+							print_writer.println("LAYER1*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET " + session_Data.getContainers().get(i).getContainer_key().replaceFirst((i)+"_", "") + " " + 
+									session_Data.getContainers().get(i).getContainer_value() + ";");
+						}
+						
+					}
 					TimeUnit.SECONDS.sleep(2);
-					Scene = session_Data.getContainers().get(0).getContainer_value().split("Scenes/")[1];
-//					if(session_Configurations.getIpAddressEverest().equalsIgnoreCase("localhost") || session_Configurations.getIpAddressScenes().equalsIgnoreCase("")) {
-//						if(!session_Configurations.getIpAddressEverest().trim().isEmpty() && session_Configurations.getPortNumber() != 0) {
-//							new Scene(session_Data.getContainers().get(0).getContainer_value()).
-//							scene_load(print_writer,session_Data.getContainers().get(0).getContainer_value());
-//						}
-//						
-//					}else {
-//						new Scene(session_Data.getContainers().get(0).getContainer_value().replace("C:", "c")).
-//								scene_load(print_writer,session_Data.getContainers().get(0).getContainer_value().replace("C:", "c"));
-//					}
+					if(whatToProcess.toUpperCase().equalsIgnoreCase("READ-DATA-AND-PREVIEW")) {
+						Scene = session_Data.getContainers().get(0).getContainer_value().split("Scenes/")[1];
+					}
+					
+					if(whatToProcess.toUpperCase().equalsIgnoreCase("PREVIEW")) {
+						Scene = valueToProcess.replace(".xml", ".sum");
+					}
+					
 					ManualFunctions.Preview(session_selected_sports,Scene, print_writer ,IsGraphicOnScreen);
 					
 					return JSONObject.fromObject(session_Data).toString();
-			
-				case "READ-DATA-AND-PREVIEW": case "PREVIEW":
-					imgdata.clear();
-					if(valueToProcess.equalsIgnoreCase("BLANK")) {
-						return JSONObject.fromObject(session_Data).toString();
-					}else {
-						if(whatToProcess.toUpperCase().equalsIgnoreCase("READ-DATA-AND-PREVIEW")) {
-							is_previous_data = true;
-						}
-						
-						if(whatToProcess.toUpperCase().equalsIgnoreCase("PREVIEW")) {
-							valueToProcess = valueToProcess.replace(".sum", ".xml");
-						}
-						//TimeUnit.SECONDS.sleep(3);
-						
-						if(session_Configurations.getIpAddressScenes().equalsIgnoreCase("localhost") || session_Configurations.getIpAddressScenes().equalsIgnoreCase("")) {
-							session_Data = (ContainerData)JAXBContext.newInstance(ContainerData.class).createUnmarshaller().unmarshal(
-									new File(ManualUtil.MANUAL_DIRECTORY + ManualUtil.DATA_DIRECTORY + valueToProcess));
-						}else {
-							session_Data = (ContainerData)JAXBContext.newInstance(ContainerData.class).createUnmarshaller().unmarshal(
-									new File("//" + session_Configurations.getIpAddressScenes() + "//" +
-											ManualUtil.MANUAL_DIRECTORY.replace("C:", "c") + ManualUtil.DATA_DIRECTORY + valueToProcess));
-						}
-						
-						Collections.sort(session_Data.getContainers());
-						
-						if(whatToProcess.toUpperCase().equalsIgnoreCase("READ-DATA-AND-PREVIEW")) {
-							if(session_Configurations.getIpAddressEverest().equalsIgnoreCase("localhost") || session_Configurations.getIpAddressScenes().equalsIgnoreCase("")) {
-								if(!session_Configurations.getIpAddressEverest().trim().isEmpty() && session_Configurations.getPortNumber() != 0) {
-									new Scene(session_Data.getContainers().get(0).getContainer_value()).
-									scene_load(print_writer,session_Data.getContainers().get(0).getContainer_value());
-								}
-								
-							}else {
-								new Scene(session_Data.getContainers().get(0).getContainer_value().replace("C:", "c")).
-										scene_load(print_writer,session_Data.getContainers().get(0).getContainer_value().replace("C:", "c"));
-							}
-						}
-						
-						for(int i = 1; i < session_Data.getContainers().size() ; i++) {
-							if(!session_Configurations.getIpAddressEverest().trim().isEmpty() && session_Configurations.getPortNumber() != 0) {
-								print_writer.println("LAYER1*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET " + session_Data.getContainers().get(i).getContainer_key().replaceFirst((i)+"_", "") + " " + 
-										session_Data.getContainers().get(i).getContainer_value() + ";");
-							}
-							
-						}
-						TimeUnit.SECONDS.sleep(2);
-						if(whatToProcess.toUpperCase().equalsIgnoreCase("READ-DATA-AND-PREVIEW")) {
-							Scene = session_Data.getContainers().get(0).getContainer_value().split("Scenes/")[1];
-						}
-						
-						if(whatToProcess.toUpperCase().equalsIgnoreCase("PREVIEW")) {
-							Scene = valueToProcess.replace(".xml", ".sum");
-						}
-						
-						ManualFunctions.Preview(session_selected_sports,Scene, print_writer ,IsGraphicOnScreen);
-						
-						return JSONObject.fromObject(session_Data).toString();
-					}
-					
-				case "LOAD_SCENE":
-					is_previous_data = false;
-					Scene = valueToProcess;
-					if(session_selected_sports.equalsIgnoreCase("BASKETBALL")) {
-						if(session_Configurations.getIpAddressEverest().equalsIgnoreCase("localhost") || session_Configurations.getIpAddressScenes().equalsIgnoreCase("")) {
-							new Scene(ManualUtil.BASKETBALL_SCENE_DIRECTORY + ManualUtil.SCENES_DIRECTORY + valueToProcess).
-							scene_load(print_writer,ManualUtil.BASKETBALL_SCENE_DIRECTORY + ManualUtil.SCENES_DIRECTORY + valueToProcess);
-						}else {
-							new Scene("//" + session_Configurations.getIpAddressScenes() + "//" + ManualUtil.BASKETBALL_SCENE_DIRECTORY.replace("C:", "c") + 
-									ManualUtil.SCENES_DIRECTORY + valueToProcess).scene_load(print_writer,"//" + session_Configurations.getIpAddressScenes() +
-											"//" + ManualUtil.BASKETBALL_SCENE_DIRECTORY.replace("C:", "c") + ManualUtil.SCENES_DIRECTORY + valueToProcess);
-						}
-					}else {
-						if(session_Configurations.getIpAddressEverest().equalsIgnoreCase("localhost") || session_Configurations.getIpAddressScenes().equalsIgnoreCase("")) {
-							new Scene(ManualUtil.CRICKET_SCENE_DIRECTORY + ManualUtil.SCENES_DIRECTORY + valueToProcess).
-							scene_load(print_writer,ManualUtil.CRICKET_SCENE_DIRECTORY + ManualUtil.SCENES_DIRECTORY + valueToProcess);
-						}else {
-							new Scene("//" + session_Configurations.getIpAddressScenes() + "//" + ManualUtil.CRICKET_SCENE_DIRECTORY.replace("C:", "c") + 
-									ManualUtil.SCENES_DIRECTORY + valueToProcess).scene_load(print_writer,"//" + session_Configurations.getIpAddressScenes() +
-											"//" + ManualUtil.CRICKET_SCENE_DIRECTORY.replace("C:", "c") + ManualUtil.SCENES_DIRECTORY + valueToProcess);
-						}
-					}
-					break;
 				}
 				
-				File file = new File(ManualUtil.MANUAL_DIRECTORY + ManualUtil.CONTAINER_FILE);
+			case "LOAD_SCENE":
+				is_previous_data = false;
+				Scene = valueToProcess;
+				if(session_Configurations.getIpAddressEverest().equalsIgnoreCase("localhost") || session_Configurations.getIpAddressScenes().equalsIgnoreCase("")) {
+					new Scene(ManualUtil.SCENE_DIRECTORY + ManualUtil.SCENES_DIRECTORY + valueToProcess).
+					scene_load(print_writer,ManualUtil.SCENE_DIRECTORY + ManualUtil.SCENES_DIRECTORY + valueToProcess);
+				}else {
+					new Scene("//" + session_Configurations.getIpAddressScenes() + "//" + ManualUtil.SCENE_DIRECTORY.replace("C:", "c") + 
+							ManualUtil.SCENES_DIRECTORY + valueToProcess).scene_load(print_writer,"//" + session_Configurations.getIpAddressScenes() +
+									"//" + ManualUtil.SCENE_DIRECTORY.replace("C:", "c") + ManualUtil.SCENES_DIRECTORY + valueToProcess);
+				}
 				
-				switch (whatToProcess.toUpperCase()) {
-				case "LOAD_PREVIOUS_SCENE":
-					
-					if(session_Configurations.getIpAddressScenes().equalsIgnoreCase("localhost") || session_Configurations.getIpAddressScenes().equalsIgnoreCase("")) {
-						session_Data = (ContainerData)JAXBContext.newInstance(ContainerData.class).createUnmarshaller().unmarshal(
-								new File(ManualUtil.MANUAL_DIRECTORY + ManualUtil.DATA_DIRECTORY + valueToProcess));
+				ManualFunctions.Preview(session_selected_sports,"", print_writer,false);
+				break;
+			}
+			
+			File file = new File(ManualUtil.MANUAL_DIRECTORY + ManualUtil.CONTAINER_FILE);
+			
+			switch (whatToProcess.toUpperCase()) {
+			case "LOAD_PREVIOUS_SCENE":
+				
+				if(session_Configurations.getIpAddressScenes().equalsIgnoreCase("localhost") || session_Configurations.getIpAddressScenes().equalsIgnoreCase("")) {
+					session_Data = (ContainerData)JAXBContext.newInstance(ContainerData.class).createUnmarshaller().unmarshal(
+							new File(ManualUtil.MANUAL_DIRECTORY + ManualUtil.DATA_DIRECTORY + valueToProcess));
+				}else {
+					session_Data = (ContainerData)JAXBContext.newInstance(ContainerData.class).createUnmarshaller().unmarshal(
+							new File("//" + session_Configurations.getIpAddressScenes() + "//" + 
+									ManualUtil.MANUAL_DIRECTORY.replace("C:", "c") + ManualUtil.DATA_DIRECTORY + valueToProcess));
+				}
+				
+				Collections.sort(session_Data.getContainers());
+				for(int i = 1; i < session_Data.getContainers().size() ; i++) {
+//					if()
+					print_writer.println("LAYER1*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET " + session_Data.getContainers().get(i).getContainer_key().replaceFirst((i)+"_", "") + " " + 
+											session_Data.getContainers().get(i).getContainer_value() + ";");
+				}
+				ManualFunctions.Preview(session_selected_sports,Scene, print_writer,IsGraphicOnScreen);
+				return JSONObject.fromObject(session_Data).toString();
+				
+			case "LOAD_DATA":
+				//Delete preview
+				new java.io.File("C:/Temp/Preview.png").delete();
+				
+				imgdata.clear();
+		        // Check if the file exists
+		        if (file.exists()) {
+		            // Try to delete the file
+		            if (file.delete()) {
+		                System.out.println("File deleted successfully.");
+		            } else {
+		                System.out.println("Failed to delete the file.");
+		            }
+		        }
+		        
+				if(session_Configurations.getIpAddressScenes().equalsIgnoreCase("localhost") || session_Configurations.getIpAddressScenes().equalsIgnoreCase("")) {
+				//Rows and columns with unwanted tags removed
+					if(valueToProcess.contains(",")) {
+						print_writer.println("LAYER1*EVEREST*STAGE*DIRECTOR*In SHOW 138.0;");
+						print_writer.println("LAYER1*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET vRows " +valueToProcess.split(",")[2]+ ";");
+						print_writer.println("LAYER1*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET vCoumms " +valueToProcess.split(",")[1]+ ";");
+						print_writer.println("LAYER1*EVEREST*GLOBAL TEMPLATE_SAVE_ACTIVE_ONLY " +
+								ManualUtil.MANUAL_DIRECTORY + ManualUtil.CONTAINER_FILE + ";");
+						print_writer.println("LAYER1*EVEREST*STAGE*DIRECTOR*In SHOW 0.0;");
 					}else {
-						session_Data = (ContainerData)JAXBContext.newInstance(ContainerData.class).createUnmarshaller().unmarshal(
-								new File("//" + session_Configurations.getIpAddressScenes() + "//" + 
-										ManualUtil.MANUAL_DIRECTORY.replace("C:", "c") + ManualUtil.DATA_DIRECTORY + valueToProcess));
+						print_writer.println("LAYER1*EVEREST*GLOBAL TEMPLATE_SAVE " +
+								ManualUtil.MANUAL_DIRECTORY + ManualUtil.CONTAINER_FILE + ";");
 					}
 					
-					Collections.sort(session_Data.getContainers());
-					for(int i = 1; i < session_Data.getContainers().size() ; i++) {
-//						if()
-						print_writer.println("LAYER1*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET " + session_Data.getContainers().get(i).getContainer_key().replaceFirst((i)+"_", "") + " " + 
-												session_Data.getContainers().get(i).getContainer_value() + ";");
+					//GetDataReturn();
+//					print_writer.println("LAYER1*EVEREST*GLOBAL TEMPLATE_SAVE " +
+//							ManualUtil.MANUAL_DIRECTORY + ManualUtil.CONTAINER_FILE + ";");
+					//print_writer.println("LAYER1*EVEREST*GLOBAL TEMPLATE_GET_ACTIVE_ONLY;");
+					TimeUnit.SECONDS.sleep(2);
+					boolean exitLoop = false; int numberOfAttempts = 5;
+					List<String> allLines = new ArrayList<String>();
+					while (exitLoop == false){
+						if(new File(ManualUtil.MANUAL_DIRECTORY + ManualUtil.CONTAINER_FILE).exists()) {
+							allLines = Files.readAllLines(Paths.get(ManualUtil.MANUAL_DIRECTORY + ManualUtil.CONTAINER_FILE));
+							break;
+						} else {
+							TimeUnit.SECONDS.sleep(1);
+							numberOfAttempts = numberOfAttempts - 1;
+						}
+						if(numberOfAttempts <= 0)
+						{
+							break;
+						}
 					}
-					ManualFunctions.Preview(session_selected_sports,Scene, print_writer,IsGraphicOnScreen);
-					return JSONObject.fromObject(session_Data).toString();
-					
-				case "LOAD_DATA":
-					//Delete preview
-					new java.io.File("C:/Temp/Preview.png").delete();
-					
-					imgdata.clear();
+					return JSONArray.fromObject(allLines).toString();
+				}else {
+					//Rows and columns with unwanted tags removed
 			        // Check if the file exists
 			        if (file.exists()) {
 			            // Try to delete the file
@@ -767,104 +581,52 @@ public class IndexController
 			                System.out.println("Failed to delete the file.");
 			            }
 			        }
-			        
-					if(session_Configurations.getIpAddressScenes().equalsIgnoreCase("localhost") || session_Configurations.getIpAddressScenes().equalsIgnoreCase("")) {
-					//Rows and columns with unwanted tags removed
-						if(valueToProcess.contains(",")) {
-							print_writer.println("LAYER1*EVEREST*STAGE*DIRECTOR*In SHOW 138.0;");
-							print_writer.println("LAYER1*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET vRows " +valueToProcess.split(",")[2]+ ";");
-							print_writer.println("LAYER1*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET vCoumms " +valueToProcess.split(",")[1]+ ";");
-							print_writer.println("LAYER1*EVEREST*GLOBAL TEMPLATE_SAVE_ACTIVE_ONLY " +
-									ManualUtil.MANUAL_DIRECTORY + ManualUtil.CONTAINER_FILE + ";");
-							print_writer.println("LAYER1*EVEREST*STAGE*DIRECTOR*In SHOW 0.0;");
-						}else {
-							print_writer.println("LAYER1*EVEREST*GLOBAL TEMPLATE_SAVE " +
-									ManualUtil.MANUAL_DIRECTORY + ManualUtil.CONTAINER_FILE + ";");
-						}
-						
-						//GetDataReturn();
-//						print_writer.println("LAYER1*EVEREST*GLOBAL TEMPLATE_SAVE " +
-//								ManualUtil.MANUAL_DIRECTORY + ManualUtil.CONTAINER_FILE + ";");
-						//print_writer.println("LAYER1*EVEREST*GLOBAL TEMPLATE_GET_ACTIVE_ONLY;");
-						TimeUnit.SECONDS.sleep(2);
-						boolean exitLoop = false; int numberOfAttempts = 5;
-						List<String> allLines = new ArrayList<String>();
-						while (exitLoop == false){
-							if(new File(ManualUtil.MANUAL_DIRECTORY + ManualUtil.CONTAINER_FILE).exists()) {
-								allLines = Files.readAllLines(Paths.get(ManualUtil.MANUAL_DIRECTORY + ManualUtil.CONTAINER_FILE));
-								break;
-							} else {
-								TimeUnit.SECONDS.sleep(1);
-								numberOfAttempts = numberOfAttempts - 1;
-							}
-							if(numberOfAttempts <= 0)
-							{
-								break;
-							}
-						}
-						return JSONArray.fromObject(allLines).toString();
+					if(valueToProcess.contains(",")) {
+						print_writer.println("LAYER1*EVEREST*STAGE*DIRECTOR*In SHOW 138.0;");
+						print_writer.println("LAYER1*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET vRows " +valueToProcess.split(",")[2]+ ";");
+						print_writer.println("LAYER1*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET vCoumms " +valueToProcess.split(",")[1]+ ";");
+						print_writer.println("LAYER1*EVEREST*GLOBAL TEMPLATE_SAVE_ACTIVE_ONLY " + "//" + session_Configurations.getIpAddressScenes() + "//" + 
+								ManualUtil.MANUAL_DIRECTORY.replace("C:", "c") + ManualUtil.CONTAINER_FILE + ";");
+						print_writer.println("LAYER1*EVEREST*STAGE*DIRECTOR*In SHOW 0.0;");
 					}else {
-						//Rows and columns with unwanted tags removed
-				        // Check if the file exists
-				        if (file.exists()) {
-				            // Try to delete the file
-				            if (file.delete()) {
-				                System.out.println("File deleted successfully.");
-				            } else {
-				                System.out.println("Failed to delete the file.");
-				            }
-				        }
-						if(valueToProcess.contains(",")) {
-							print_writer.println("LAYER1*EVEREST*STAGE*DIRECTOR*In SHOW 138.0;");
-							print_writer.println("LAYER1*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET vRows " +valueToProcess.split(",")[2]+ ";");
-							print_writer.println("LAYER1*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET vCoumms " +valueToProcess.split(",")[1]+ ";");
-							print_writer.println("LAYER1*EVEREST*GLOBAL TEMPLATE_SAVE_ACTIVE_ONLY " + "//" + session_Configurations.getIpAddressScenes() + "//" + 
-									ManualUtil.MANUAL_DIRECTORY.replace("C:", "c") + ManualUtil.CONTAINER_FILE + ";");
-							print_writer.println("LAYER1*EVEREST*STAGE*DIRECTOR*In SHOW 0.0;");
-						}else {
-							print_writer.println("LAYER1*EVEREST*GLOBAL TEMPLATE_SAVE " + "//" + session_Configurations.getIpAddressScenes() + "//" + 
-									ManualUtil.MANUAL_DIRECTORY.replace("C:", "c") + ManualUtil.CONTAINER_FILE + ";");
-						}
-						
-						TimeUnit.SECONDS.sleep(2);
-						boolean exitLoop = false; int numberOfAttempts = 5;
-						List<String> allLines = new ArrayList<String>();
-						while (exitLoop == false){
-							if(new File("//" + session_Configurations.getIpAddressScenes() + "//" +
-									ManualUtil.MANUAL_DIRECTORY.replace("C:", "c") + ManualUtil.CONTAINER_FILE).exists()) {
-								allLines = Files.readAllLines(Paths.get("//" + session_Configurations.getIpAddressScenes() + "//" + 
-									ManualUtil.MANUAL_DIRECTORY.replace("C:", "c") + ManualUtil.CONTAINER_FILE));
-								break;
-							} else {
-								TimeUnit.SECONDS.sleep(1);
-								numberOfAttempts = numberOfAttempts - 1;
-							}
-							if(numberOfAttempts <= 0)
-							{
-								break;
-							}
-						}
-						return JSONArray.fromObject(allLines).toString();
+						print_writer.println("LAYER1*EVEREST*GLOBAL TEMPLATE_SAVE " + "//" + session_Configurations.getIpAddressScenes() + "//" + 
+								ManualUtil.MANUAL_DIRECTORY.replace("C:", "c") + ManualUtil.CONTAINER_FILE + ";");
 					}
-				case "PREVIEW_IMAGE_DATA":
 					
-					TimeUnit.MILLISECONDS.sleep(1500);
-				    JSONObject json = new JSONObject();
-				    Path filePath = session_Configurations.getIpAddressEverest().equalsIgnoreCase("LOCALHOST") 
-				        ? Paths.get("C:\\Temp\\Preview.png") 
-				        : Paths.get("\\\\" + session_Configurations.getIpAddressEverest() + "\\c\\Temp\\Preview.png");
-
-				    if (Files.exists(filePath)) {
-				        json.put("file_data", Base64.getEncoder().encodeToString(Files.readAllBytes(filePath)));
-				        json.put("content_type", "image/PNG");
-				        return json.toString();
-				    }
-				    return "Preview Image does not exist."; 
-
+					TimeUnit.SECONDS.sleep(2);
+					boolean exitLoop = false; int numberOfAttempts = 5;
+					List<String> allLines = new ArrayList<String>();
+					while (exitLoop == false){
+						if(new File("//" + session_Configurations.getIpAddressScenes() + "//" +
+								ManualUtil.MANUAL_DIRECTORY.replace("C:", "c") + ManualUtil.CONTAINER_FILE).exists()) {
+							allLines = Files.readAllLines(Paths.get("//" + session_Configurations.getIpAddressScenes() + "//" + 
+								ManualUtil.MANUAL_DIRECTORY.replace("C:", "c") + ManualUtil.CONTAINER_FILE));
+							break;
+						} else {
+							TimeUnit.SECONDS.sleep(1);
+							numberOfAttempts = numberOfAttempts - 1;
+						}
+						if(numberOfAttempts <= 0)
+						{
+							break;
+						}
+					}
+					return JSONArray.fromObject(allLines).toString();
 				}
-				break;
-			}
-			
+			case "PREVIEW_IMAGE_DATA":
+				
+				TimeUnit.MILLISECONDS.sleep(1500);
+			    JSONObject json = new JSONObject();
+			    Path filePath = session_Configurations.getIpAddressEverest().equalsIgnoreCase("LOCALHOST") 
+			        ? Paths.get("C:\\Temp\\Preview.png") 
+			        : Paths.get("\\\\" + session_Configurations.getIpAddressEverest() + "\\c\\Temp\\Preview.png");
+
+			    if (Files.exists(filePath)) {
+			        json.put("file_data", Base64.getEncoder().encodeToString(Files.readAllBytes(filePath)));
+			        json.put("content_type", "image/PNG");
+			        return json.toString();
+			    }
+			    return "Preview Image does not exist."; 			}
 			switch (whatToProcess.toUpperCase()) {
 			
 			case "ANIMATE-OUT":
@@ -1061,4 +823,10 @@ public class IndexController
 		return "";
 		
     }
+	
+	public static String getOnlineCurrentDate() throws MalformedURLException, IOException
+	{
+		HttpURLConnection httpCon = (HttpURLConnection) new URL("https://mail.google.com/").openConnection();
+		return new SimpleDateFormat("yyyy-MM-dd").format(new Date(httpCon.getDate()));
+	}
 }

@@ -39,7 +39,7 @@ function initialisePage(whichPage)
 }
 function processPreviewSelection(whichInput)
 {
-	if($(whichInput).attr('id').includes('Logo') || $(whichInput).attr('id').includes('Image')){
+	if($(whichInput).attr('id').includes('Logo') ||$(whichInput).attr('id').includes('Sponsor')|| $(whichInput).attr('id').includes('Image')){
 		uploadFormDataToSessionObjects('file',$(whichInput).attr('id'));
 	}else{
 		uploadFormDataToSessionObjects('MATCH_PREVIEW',null);
@@ -49,7 +49,7 @@ function processPreviewSelection(whichInput)
 }
 function processUserSelection(whichInput)
 {		
-	if($(whichInput).attr('id').includes('Logo') || $(whichInput).attr('id').includes('Image')){
+	if($(whichInput).attr('id').includes('Logo')||$(whichInput).attr('id').includes('Sponsor') || $(whichInput).attr('id').includes('Image')){
 		uploadFormDataToSessionObjects('file',$(whichInput).attr('id'));
 	}else{
 		switch ($(whichInput).attr('id')) {
@@ -445,12 +445,14 @@ function addItemsToList(whatToProcess, dataToProcess){
 						
 						select.setAttribute('onchange','processUserSelection(this);');
 						select.setAttribute('onblur', 'processPreviewSelection(this);');
+						
 						label = document.createElement('label');
 						label.type = 'label';
 						label.style = 'display:block';
 						label.innerHTML =(i - 1) + '_' + dataToProcess[i].split(':')[0];
 						label.for = select.id;
 						div.appendChild(label).appendChild(select);
+						select.setAttribute('onchange','processUserSelection(this);');
 						select.setAttribute('onblur', 'processPreviewSelection(this);');
 					}else{
 						select = document.createElement('input')
@@ -565,7 +567,7 @@ function addItemsToList(whatToProcess, dataToProcess){
 							col_id = col_id + 1; // 2
 							col_num_per_row = col_num_per_row + 1; // 6
 						}
-						if(cont.container_key.includes('Logo') || cont.container_key.includes('Image')){
+						if(cont.container_key.includes('Logo')||cont.container_key.includes('Sponsor') || cont.container_key.includes('Image')){
 							select = document.createElement('input')
 							select.type = 'file';
 							select.accept = 'image/*';

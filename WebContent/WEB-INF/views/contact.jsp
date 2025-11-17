@@ -136,10 +136,7 @@
     <h2>MANUAL PATHS</h2>
     <ul>
         <li><b>MANUAL FOLDER:</b> C:\Sports\Manual</li>
-        <li><b>MANUAL SCENE PATH CRICKET:</b> C:/DOAD_In_House_Everest/Everest_Cricket/ACC/Scenes/</li>
-        <li><b>MANUAL SCENE PATH FOOTBALL:</b> C:/DOAD_In_House_Everest/Everest_Sports/Everest_I-League_2022/Scenes/</li>
-        <li><b>MANUAL SCENE PATH BASKETBALL:</b> C:/DOAD_In_House_Everest/Everest_Sports/BASKETBALL/Scenes/</li>
-        <li><b>MANUAL SCENE PATH BADMINTON:</b> C:/DOAD_In_House_Everest/Everest_Sports/Everest_GBPL/Scenes/</li>
+        <li><b>MANUAL SCENE PATH :</b> C:/DOAD_In_House_Everest/Manual/Scenes/</li>
     </ul>
 
     <a href="initialise" class="btn-back">Back to Initialise</a>

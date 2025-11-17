@@ -97,21 +97,21 @@
   <!-- Additional Responsive & Modern CSS -->
   <style type="text/css">
    body {
-    font-size: 1.95rem; /* 22px converted to rem (assuming 16px base) */
+    font-size: 1.6rem; /* 22px converted to rem (assuming 16px base) */
    }
    h1, h2, h3, h4, h5, h6,a {
     font-size: larger; /* This remains relative to the base font-size */
    }
    button, input, select, textarea {
-    font-size: 1.7rem; /* 18px converted to rem */
+    font-size: 1.5rem; /* 18px converted to rem */
    }
    .card-title, .panel-title, .form-group label {
-     font-size: 1.8rem; /* 20px converted to rem */
+     font-size: 1.4rem; /* 20px converted to rem */
    }
     /* Subtle gradient background for entire page */
     body {
-    margin: 0;
-    padding: 0;
+    padding: 0 !important;
+  	margin: 0 !important;
     color: #2E008B;
     font-family: Arial, sans-serif;
     background: url('<c:url value='/resources/Images/img_2.jpg'/>') no-repeat center center fixed;
@@ -133,23 +133,23 @@
     #main_div.content.py-1 {
       width: 100vw;
       height: 100vh;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      box-shadow: 0 4px 2px rgba(0,0,0,0.2);
       border-radius: 12px;
       overflow: hidden;
     }
     /* The outer .col-md-13 offset-md-0 container */
     .col-md-13.offset-md-0 {
       border-radius: 20px;
-      box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+      box-shadow: 0 5px 5px rgba(0,0,0,0.2);
       padding: 5px;
-      margin-bottom: 20px;
+      margin-bottom: 4px;
     }
     /* Card styling improvements */
     .card.card-outline-secondary {
       background: #fff;
       border-radius: 8px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      margin-bottom: 20px;
+      box-shadow: 0 4px 5px rgba(0,0,0,0.1);
+      margin-bottom: 2px;
       border: none; /* Hide default card border */
     }
     .card-header {
@@ -159,7 +159,7 @@
       border-bottom: 1px solid #ddd;
     }
     .card-body {
-      padding: 20px;
+      padding: 15px;
     }
     /* The 'Configuration' panel heading */
     .panel-heading {
@@ -173,7 +173,7 @@
 
     /* Buttons with a slight box-shadow & hover effect */
     .btn-sm {
-      padding: 8px 16px;
+      padding: 8px 10px;
       border-radius: 5px;
       transition: background-color 0.3s ease, box-shadow 0.3s ease;
     }
@@ -195,7 +195,7 @@
       background-color: #fff;
       border-radius: 8px;
       box-shadow: 10px 5px 50px #9AA2A2;
-      padding: 28px 8px;
+      padding: 20px 8px;
       margin-right: 20px;
     }
     #event_stats_div {
@@ -286,7 +286,7 @@
 	  background-color: white;
 	  border-radius: 2px;
 	  box-shadow: 10px 5px 50px #9AA2A2;
-	  padding: 28px 8px;
+	  padding: 20px 8px;
 	  width: 50%;
 	  max-width: 100%;
 	  height: 600px;        /* or 'auto' + a max-height, if you prefer */
@@ -354,7 +354,7 @@
 	.purple-btn {
 	  background-color: #2E008B;
 	  color: #FEFEFE;
-	  font-size: 1.75rem; /* 18px => 1.125rem */
+	  font-size: 1.7rem; /* 18px => 1.125rem */
 	  text-shadow: 0.125rem 0.3125rem 0.375rem #BBA2B6;
 	  transition: background-color 0.3s ease, box-shadow 0.3s ease;
 	}
@@ -368,7 +368,7 @@
 	.red-btn {
 	  background-color: #f44336;
 	  color: #FEFEFE;
-	  font-size: 1.75rem;
+	  font-size: 1.7rem;
 	  text-shadow: 0.125rem 0.3125rem 0.375rem #BBA2B6;
 	  transition: background-color 0.3s ease, box-shadow 0.3s ease;
 	}
@@ -376,6 +376,10 @@
 	  color: #fff; 
 	  box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.15);
 	}
+	.form-group.row {
+	  margin-bottom: 5px !important;
+	}
+	
 	/* For screens with width <= 769px (Mobile and Small Tablet) */
 	@media (max-width: 769px) {
 	
@@ -398,12 +402,16 @@
 	        margin-bottom: 1rem; /* Add space between the columns */
 	        padding: 0; /* Remove unnecessary padding */
 	    }
-	
+		.right-col {
+		    justify-content: flex-start;
+		    gap: 0.5rem;
+		  }
 	    /* Stack .row-item elements inside .left-col and .right-col */
 	    .row-item {
 	        display: flex;
 	        flex-direction: column; /* Stack label and select vertically */
 	        gap: 0.5rem; /* Adjust gap */
+    		margin-bottom: 0.5rem;
 	        align-items: flex-start; /* Align items to the start */
 	    }
 	
@@ -432,7 +440,7 @@
 	    /* .btn-sm adjustments */
 	    .btn-sm {
 	        font-size: 1rem; /* Adjust font size for buttons */
-	        padding: 10px 18px; /* Increase padding for better touch targets */
+	        padding: 10px 10px; /* Increase padding for better touch targets */
 	    }
 	
 	    /* Adjust .purple-btn and .red-btn for better visibility and touch interaction */

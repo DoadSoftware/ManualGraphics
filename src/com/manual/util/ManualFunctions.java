@@ -33,7 +33,7 @@ public class ManualFunctions
 		print_writer.println("LAYER1*EVEREST*STAGE*DIRECTOR*Out SHOW 0.0;");
 		print_writer.println("LAYER1*EVEREST*GLOBAL SNAPSHOT_PATH C:/Temp/Preview.png;");
 		print_writer.println("LAYER1*EVEREST*GLOBAL SNAPSHOT 1920 1080;");
-		TimeUnit.SECONDS.sleep(1);
+		TimeUnit.MILLISECONDS.sleep(600);
 		print_writer.println("LAYER1*EVEREST*STAGE*DIRECTOR*Out SHOW 0.0;");
 		if(!isGraphicOnScreen) {
 			print_writer.println("LAYER1*EVEREST*STAGE*DIRECTOR*In SHOW 0.0;");	
