@@ -41,6 +41,9 @@ public class Scene {
 		print_writer.println("LAYER1*EVEREST*STAGE*DIRECTOR*In SHOW 0.0;");
 		TimeUnit.SECONDS.sleep(1);
 		
+		print_writer.println("LAYER6*EVEREST*SINGLE_SCENE LOAD " + scene_path + ";");
+		TimeUnit.SECONDS.sleep(1);
+		
 		//print_writer.println("LAYER1*EVEREST*SINGLE_SCENE CLEAR;");
 	}
 }

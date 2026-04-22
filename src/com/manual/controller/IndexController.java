@@ -20,7 +20,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.Date;
@@ -64,11 +63,12 @@ public class IndexController
 	public static Configurations session_Configurations;
 	public static PrintWriter print_writer;
 	public static ContainerData session_Data;
-	public static String expiry_date = "2025-11-21";
+	public static String expiry_date = "2026-11-21";
 	public static String current_date;
 	String session_selected_sports,session_selected_PreviewIp;
 	String Data;
 	String Scene;
+	String connection;
 	public static boolean IsGraphicOnScreen = false;
 	boolean is_previous_data = false;
 	List<ImageData> imgdata = new ArrayList<ImageData>();
@@ -325,6 +325,10 @@ public class IndexController
 						if(!session_Configurations.getIpAddressEverest().trim().isEmpty() && session_Configurations.getPortNumber() != 0) {
 							print_writer.println("LAYER1*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET " + containers.get(i).getContainer_key().replaceFirst((i)+"_", "") + " " + 
 									containers.get(i).getContainer_value() + ";");
+							
+							TimeUnit.MILLISECONDS.sleep(500);
+							print_writer.println("LAYER6*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET " + containers.get(i).getContainer_key().replaceFirst((i)+"_", "") + " " + 
+									containers.get(i).getContainer_value() + ";");
 						}
 						
 					}
@@ -464,6 +468,10 @@ public class IndexController
 						if(!session_Configurations.getIpAddressEverest().trim().isEmpty() && session_Configurations.getPortNumber() != 0) {
 							print_writer.println("LAYER1*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET " + session_Data.getContainers().get(i).getContainer_key().replaceFirst((i)+"_", "") + " " + 
 									session_Data.getContainers().get(i).getContainer_value() + ";");
+							
+							TimeUnit.MILLISECONDS.sleep(200);
+							print_writer.println("LAYER6*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET " + session_Data.getContainers().get(i).getContainer_key().replaceFirst((i)+"_", "") + " " + 
+									session_Data.getContainers().get(i).getContainer_value() + ";");
 						}
 						
 					}
@@ -516,24 +524,28 @@ public class IndexController
 //					if()
 					print_writer.println("LAYER1*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET " + session_Data.getContainers().get(i).getContainer_key().replaceFirst((i)+"_", "") + " " + 
 											session_Data.getContainers().get(i).getContainer_value() + ";");
+					
+					TimeUnit.MILLISECONDS.sleep(200);
+					print_writer.println("LAYER6*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET " + session_Data.getContainers().get(i).getContainer_key().replaceFirst((i)+"_", "") + " " + 
+							session_Data.getContainers().get(i).getContainer_value() + ";");
 				}
 				ManualFunctions.Preview(session_selected_sports,Scene, print_writer,IsGraphicOnScreen);
 				return JSONObject.fromObject(session_Data).toString();
 				
 			case "LOAD_DATA":
 				//Delete preview
-				new java.io.File("C:/Temp/Preview.png").delete();
+//				new java.io.File("C:/Temp/Preview.png").delete();
 				
 				imgdata.clear();
 		        // Check if the file exists
-		        if (file.exists()) {
-		            // Try to delete the file
-		            if (file.delete()) {
-		                System.out.println("File deleted successfully.");
-		            } else {
-		                System.out.println("Failed to delete the file.");
-		            }
-		        }
+//		        if (file.exists()) {
+//		            // Try to delete the file
+//		            if (file.delete()) {
+//		                System.out.println("File deleted successfully.");
+//		            } else {
+//		                System.out.println("Failed to delete the file.");
+//		            }
+//		        }
 		        
 				if(session_Configurations.getIpAddressScenes().equalsIgnoreCase("localhost") || session_Configurations.getIpAddressScenes().equalsIgnoreCase("")) {
 				//Rows and columns with unwanted tags removed
@@ -544,6 +556,17 @@ public class IndexController
 						print_writer.println("LAYER1*EVEREST*GLOBAL TEMPLATE_SAVE_ACTIVE_ONLY " +
 								ManualUtil.MANUAL_DIRECTORY + ManualUtil.CONTAINER_FILE + ";");
 						print_writer.println("LAYER1*EVEREST*STAGE*DIRECTOR*In SHOW 0.0;");
+						
+						
+						
+						TimeUnit.MILLISECONDS.sleep(400);
+						
+						print_writer.println("LAYER6*EVEREST*STAGE*DIRECTOR*In SHOW 138.0;");
+						print_writer.println("LAYER6*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET vRows " +valueToProcess.split(",")[2]+ ";");
+						print_writer.println("LAYER6*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET vCoumms " +valueToProcess.split(",")[1]+ ";");
+						print_writer.println("LAYER6*EVEREST*GLOBAL TEMPLATE_SAVE_ACTIVE_ONLY " +
+								ManualUtil.MANUAL_DIRECTORY + ManualUtil.CONTAINER_FILE + ";");
+						print_writer.println("LAYER6*EVEREST*STAGE*DIRECTOR*In SHOW 0.0;");
 					}else {
 						print_writer.println("LAYER1*EVEREST*GLOBAL TEMPLATE_SAVE " +
 								ManualUtil.MANUAL_DIRECTORY + ManualUtil.CONTAINER_FILE + ";");
@@ -573,14 +596,14 @@ public class IndexController
 				}else {
 					//Rows and columns with unwanted tags removed
 			        // Check if the file exists
-			        if (file.exists()) {
-			            // Try to delete the file
-			            if (file.delete()) {
-			                System.out.println("File deleted successfully.");
-			            } else {
-			                System.out.println("Failed to delete the file.");
-			            }
-			        }
+//			        if (file.exists()) {
+//			            // Try to delete the file
+//			            if (file.delete()) {
+//			                System.out.println("File deleted successfully.");
+//			            } else {
+//			                System.out.println("Failed to delete the file.");
+//			            }
+//			        }
 					if(valueToProcess.contains(",")) {
 						print_writer.println("LAYER1*EVEREST*STAGE*DIRECTOR*In SHOW 138.0;");
 						print_writer.println("LAYER1*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET vRows " +valueToProcess.split(",")[2]+ ";");
@@ -615,11 +638,11 @@ public class IndexController
 				}
 			case "PREVIEW_IMAGE_DATA":
 				
-				TimeUnit.MILLISECONDS.sleep(1500);
+				TimeUnit.MILLISECONDS.sleep(3500);
 			    JSONObject json = new JSONObject();
 			    Path filePath = session_Configurations.getIpAddressEverest().equalsIgnoreCase("LOCALHOST") 
-			        ? Paths.get("C:\\Temp\\Preview.png") 
-			        : Paths.get("\\\\" + session_Configurations.getIpAddressEverest() + "\\c\\Temp\\Preview.png");
+			        ? Paths.get("D:\\layer6_snapshot.png") 
+			        : Paths.get("\\\\" + session_Configurations.getIpAddressEverest() + "\\c\\layer6_snapshot.png");
 
 			    if (Files.exists(filePath)) {
 			        json.put("file_data", Base64.getEncoder().encodeToString(Files.readAllBytes(filePath)));
@@ -646,8 +669,12 @@ public class IndexController
 			
 			case "CHECK_CONNECTION":
 				JSONObject json = new JSONObject();
-				String connection = session_Configurations.getIpAddressEverest().equalsIgnoreCase("LOCALHOST")? 
-						ManualFunctions.checkConnection("127.0.0.1", session_Configurations.getPortNumber(), 1000): ManualFunctions.checkConnection(session_Configurations.getIpAddressEverest(), session_Configurations.getPortNumber(), 1000);
+				if(session_Configurations != null) {
+					connection = session_Configurations.getIpAddressEverest().equalsIgnoreCase("LOCALHOST")? 
+							ManualFunctions.checkConnection("127.0.0.1", session_Configurations.getPortNumber(), 1000): ManualFunctions.checkConnection(session_Configurations.getIpAddressEverest(),
+									session_Configurations.getPortNumber(), 1000);
+				}
+				
 				 json.put("connection_type", connection);
 			    return json.toString();
 			}
