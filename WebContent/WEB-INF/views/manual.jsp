@@ -625,6 +625,9 @@
 							    <button class="btn btn-sm red-btn" type="button" name="connection_btn" id="connection_btn" onclick="processUserSelection(this)">
 							     RE CONNECT
 							    </button>
+							    <button class="btn btn-sm red-btn" type="button" name="preview_btn" id="preview_btn" onclick="processManualProcedures('PREVIEW_IMAGE_DATA')">
+							     PREVIEW
+							    </button>
 							  </div>
 							</div>
 						 <div class="form-group row row-bottom-margin ml-2">

@@ -84,7 +84,10 @@ function processUserSelection(whichInput)
 			}else{
 				document.initialise_form.submit();
 			}
-			break;	
+			break;
+		case 'preview_btn':
+			processManualProcedures('PREVIEW-IN');
+			break;		
 		case 'clear_all_btn':
 			if(confirm('Are You Sure To Clear All Scenes? ') == true){
 				//$('#logging_stats_div').hide();
@@ -278,7 +281,8 @@ function processManualProcedures(whatToProcess)
 				addItemsToList('LOAD_DATA-OPTIONS',data);
 				break;
 			case 'LOAD_SCENE':
-				if($('#selectedScene option:selected').val().includes('_Rows_')){
+				if($('#selectedScene option:selected').val().includes('_Rows_') || 
+						$('#selectedScene option:selected').val().includes('_Row_')){
 					addItemsToList('ROWS_COLUMN-OPTIONS',data);
 				}
 				break;

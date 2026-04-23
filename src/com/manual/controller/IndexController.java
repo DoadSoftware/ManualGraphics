@@ -390,7 +390,7 @@ public class IndexController
 					session_Configurations.getPortNumber()).getOutputStream(), true);
 			return null;
 		case "LOAD_SCENE": case "LOAD_DATA": case "CHECK_CONNECTION":case "LOAD_PREVIOUS_SCENE": case "ANIMATE-OUT": case "ANIMATE-IN": case "CLEAR-ALL": case "BADMINTON-OPTIONS": 
-		case "READ-DATA-AND-PREVIEW": case "LOAD_CONTAINER": case "PREVIEW":case "MATCH_PREVIEW":case"PREVIEW_IMAGE_DATA":
+		case "READ-DATA-AND-PREVIEW": case "LOAD_CONTAINER": case "PREVIEW":case "MATCH_PREVIEW":case"PREVIEW_IMAGE_DATA": case "PREVIEW-IN":
 			switch(whatToProcess.toUpperCase()) {
 			case "LOAD_CONTAINER":
 				imgdata.clear();
@@ -611,8 +611,22 @@ public class IndexController
 						print_writer.println("LAYER1*EVEREST*GLOBAL TEMPLATE_SAVE_ACTIVE_ONLY " + "//" + session_Configurations.getIpAddressScenes() + "//" + 
 								ManualUtil.MANUAL_DIRECTORY.replace("C:", "c") + ManualUtil.CONTAINER_FILE + ";");
 						print_writer.println("LAYER1*EVEREST*STAGE*DIRECTOR*In SHOW 0.0;");
+						
+						TimeUnit.SECONDS.sleep(200);
+						
+						print_writer.println("LAYER6*EVEREST*STAGE*DIRECTOR*In SHOW 138.0;");
+						print_writer.println("LAYER6*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET vRows " +valueToProcess.split(",")[2]+ ";");
+						print_writer.println("LAYER6*EVEREST*TREEVIEW*Main*FUNCTION*TAG_CONTROL SET vCoumms " +valueToProcess.split(",")[1]+ ";");
+						print_writer.println("LAYER6*EVEREST*GLOBAL TEMPLATE_SAVE_ACTIVE_ONLY " + "//" + session_Configurations.getIpAddressScenes() + "//" + 
+								ManualUtil.MANUAL_DIRECTORY.replace("C:", "c") + ManualUtil.CONTAINER_FILE + ";");
+						print_writer.println("LAYER6*EVEREST*STAGE*DIRECTOR*In SHOW 0.0;");
 					}else {
 						print_writer.println("LAYER1*EVEREST*GLOBAL TEMPLATE_SAVE " + "//" + session_Configurations.getIpAddressScenes() + "//" + 
+								ManualUtil.MANUAL_DIRECTORY.replace("C:", "c") + ManualUtil.CONTAINER_FILE + ";");
+						
+						TimeUnit.SECONDS.sleep(2);
+						
+						print_writer.println("LAYER6*EVEREST*GLOBAL TEMPLATE_SAVE " + "//" + session_Configurations.getIpAddressScenes() + "//" + 
 								ManualUtil.MANUAL_DIRECTORY.replace("C:", "c") + ManualUtil.CONTAINER_FILE + ";");
 					}
 					
@@ -636,20 +650,19 @@ public class IndexController
 					}
 					return JSONArray.fromObject(allLines).toString();
 				}
-			case "PREVIEW_IMAGE_DATA":
-				
-				TimeUnit.MILLISECONDS.sleep(3500);
+			case "PREVIEW_IMAGE_DATA": case "PREVIEW-IN":
 			    JSONObject json = new JSONObject();
 			    Path filePath = session_Configurations.getIpAddressEverest().equalsIgnoreCase("LOCALHOST") 
 			        ? Paths.get("D:\\layer6_snapshot.png") 
-			        : Paths.get("\\\\" + session_Configurations.getIpAddressEverest() + "\\c\\layer6_snapshot.png");
+			        : Paths.get("\\\\" + session_Configurations.getIpAddressEverest() + "\\d\\layer6_snapshot.png");
 
 			    if (Files.exists(filePath)) {
 			        json.put("file_data", Base64.getEncoder().encodeToString(Files.readAllBytes(filePath)));
 			        json.put("content_type", "image/PNG");
 			        return json.toString();
 			    }
-			    return "Preview Image does not exist."; 			}
+			    return "Preview Image does not exist."; 			
+		}
 			switch (whatToProcess.toUpperCase()) {
 			
 			case "ANIMATE-OUT":

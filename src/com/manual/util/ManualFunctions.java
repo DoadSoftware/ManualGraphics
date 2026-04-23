@@ -21,7 +21,7 @@ public class ManualFunctions
 				break;
 		}
 		//print_writer.println("LAYER6*EVEREST*SINGLE_SCENE LOAD C:\\DOAD_In_House_Everest\\Manual\\Scenes\\" + scene + ".sum;");
-		print_writer.println("LAYER6*EVEREST*STAGE*DIRECTOR*In SHOW 40;");
+		print_writer.println("LAYER6*EVEREST*STAGE*DIRECTOR*In SHOW 190;");
 		print_writer.println("LAYER1*EVEREST*GLOBAL OFFSCREEN_SNAPSHOT ON;");
 		
 //		print_writer.println("LAYER1*EVEREST*GLOBAL PREVIEW ON;");
